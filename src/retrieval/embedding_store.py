@@ -25,8 +25,22 @@ class EmbeddingStore:
             config: Configuration dict
         """
         self.config = config
-        self.model_name = config.get('model_name', 'BAAI/bge-base-en-v1.5')
-        self.dimension = config.get('dimension', 768)
+        
+        # Auto-detect environment and choose appropriate model
+        import os
+        is_huggingface_space = os.getenv("SPACE_ID") is not None
+        
+        if is_huggingface_space:
+            # Use lightweight model for HuggingFace Spaces (limited RAM)
+            self.model_name = "sentence-transformers/all-MiniLM-L6-v2"
+            self.dimension = 384  # Smaller dimension for lightweight model
+            self.logger.info("🌐 Running on HuggingFace Spaces - using lightweight model")
+        else:
+            # Use full-size model for local deployment
+            self.model_name = config.get('model_name', 'BAAI/bge-base-en-v1.5')
+            self.dimension = config.get('dimension', 768)
+            self.logger.info("💻 Running locally - using full-size model")
+        
         self.normalize = config.get('normalize', True)
         self.batch_size = config.get('batch_size', 32)
         
