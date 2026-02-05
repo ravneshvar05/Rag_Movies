@@ -62,8 +62,8 @@ llm:
     timeout: 60
     
   answerer:
-    primary_model: "meta-llama/Llama-2-70b-chat-hf"
-    fallback_model: "meta-llama/Llama-2-13b-chat-hf"
+    primary_model: "llama-3.3-70b-versatile"  # Groq: Latest Llama 3.3
+    fallback_model: "llama-3.1-8b-instant"    # Groq: Fast fallback
     max_tokens: 1500
     temperature: 0.3
     timeout: 90

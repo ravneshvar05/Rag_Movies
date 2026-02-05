@@ -90,7 +90,8 @@ class ContextDistiller:
                 ],
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
-                timeout=self.timeout
+                max_tokens=self.max_tokens,
+                temperature=self.temperature
             )
             
             distilled_text = response.choices[0].message.content.strip()

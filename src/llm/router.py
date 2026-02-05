@@ -66,7 +66,8 @@ class QuestionRouter:
                 ],
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
-                timeout=self.timeout
+                max_tokens=self.max_tokens,
+                temperature=self.temperature
             )
             
             # Extract response text
