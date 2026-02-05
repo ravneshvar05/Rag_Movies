@@ -54,12 +54,21 @@ def initialize_system(config: dict):
     
     # Override paths for HF Spaces persistence
     if IS_HF_SPACE:
-        logger.info("Running on HuggingFace Spaces - Using persistent storage at /data")
-        config['paths']['metadata_db'] = str(DATA_DIR / "metadata.db")
-        config['paths']['vector_db'] = str(DATA_DIR / "vector_db")
+        logger.info("🌐 Running on HuggingFace Spaces - Using persistent storage at /data")
+        base_data_path = Path("/data")
+        
+        # Override ALL data paths to use persistent storage
+        config['paths']['raw_srt'] = str(base_data_path / "raw_srt")
+        config['paths']['processed'] = str(base_data_path / "processed")
+        config['paths']['metadata_db'] = str(base_data_path / "processed" / "metadata.db")
+        config['paths']['vector_db'] = str(base_data_path / "processed" / "vector_db")
         
         # Ensure directories exist
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        base_data_path.mkdir(parents=True, exist_ok=True)
+        Path(config['paths']['raw_srt']).mkdir(parents=True, exist_ok=True)
+        Path(config['paths']['processed']).mkdir(parents=True, exist_ok=True)
+    else:
+        logger.info("💻 Running locally - Using ./data directory")
     
     # Initialize stores
     metadata_store = MetadataStore(config['paths']['metadata_db'])
