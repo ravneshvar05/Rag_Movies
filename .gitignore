@@ -52,6 +52,8 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Models cache
-models/
+# Models cache (only ignore root models folder or specific extensions)
+*.pth
+*.bin
+*.h5
 .cache/
