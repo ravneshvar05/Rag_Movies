@@ -1,0 +1,62 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.2, pytest-7.4.4, pluggy-1.6.0 -- D:\Intership Projects\Rag_Movies\movie_rag\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Intership Projects\Rag_Movies\movie_rag
+plugins: anyio-4.12.1, cov-4.1.0
+collecting ... collected 6 items
+
+tests/test_components.py::test_srt_parser PASSED                         [ 16%]
+tests/test_components.py::test_chunker_scene_aware PASSED                [ 33%]
+tests/test_components.py::test_metadata_store_crud PASSED                [ 50%]
+tests/test_components.py::test_embedding_store PASSED                    [ 66%]
+tests/test_components.py::test_question_router FAILED                    [ 83%]
+tests/test_components.py::test_answerer PASSED                           [100%]
+
+================================== FAILURES ===================================
+____________________________ test_question_router _____________________________
+
+mock_client_cls = <MagicMock name='InferenceClient' id='2676831193664'>
+test_config = {'embedding': {'batch_size': 32, 'dimension': 384, 'model_name': 'mock-model', 'normalize': True, ...}, 'ingestion': {... 'processed': 'tests/temp_data/processed', 'raw_srt': 'tests/temp_data/raw', 'vector_db': 'tests/temp_vector_db'}, ...}
+
+    @patch('src.llm.router.InferenceClient')
+    @patch.dict(os.environ, {"HF_TOKEN": "mock_token"})
+    def test_question_router(mock_client_cls, test_config):
+        """Test router parsing logic without api calls."""
+        mock_client = MagicMock()
+        mock_client_cls.return_value = mock_client
+    
+        # Mock return value usually has .choices[0].message.content
+        mock_response = MagicMock()
+        mock_response.choices[0].message.content = '{"category": "WHAT", "requires_full_narrative": false}'
+        mock_client.chat_completion.return_value = mock_response
+    
+        router = QuestionRouter(test_config['llm']['router'])
+>       route = router.route_question("What happens at the end?")
+E       AttributeError: 'QuestionRouter' object has no attribute 'route_question'
+
+tests\test_components.py:120: AttributeError
+---------------------------- Captured stdout call -----------------------------
+2026-02-04 21:46:15,319 - src.llm.router - INFO - Router initialized with model: mock-router
+============================== warnings summary ===============================
+venv\Lib\site-packages\pydantic\_internal\_fields.py:149
+  D:\Intership Projects\Rag_Movies\movie_rag\venv\Lib\site-packages\pydantic\_internal\_fields.py:149: UserWarning: Field "model_used" has conflict with protected namespace "model_".
+  
+  You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
+    warnings.warn(
+
+<frozen importlib._bootstrap>:488
+tests/test_components.py::test_embedding_store
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+tests/test_components.py::test_embedding_store
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+tests/test_components.py::test_embedding_store
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_components.py::test_question_router - AttributeError: 'Ques...
+=================== 1 failed, 5 passed, 6 warnings in 9.99s ===================
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

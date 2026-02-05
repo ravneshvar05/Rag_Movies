@@ -1,0 +1,146 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.2, pytest-7.4.4, pluggy-1.6.0 -- D:\Intership Projects\Rag_Movies\movie_rag\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Intership Projects\Rag_Movies\movie_rag
+plugins: anyio-4.12.1, cov-4.1.0
+collecting ... collected 6 items
+
+tests/test_components.py::test_srt_parser PASSED                         [ 16%]
+tests/test_components.py::test_chunker_scene_aware PASSED                [ 33%]
+tests/test_components.py::test_metadata_store_crud FAILED                [ 50%]
+tests/test_components.py::test_embedding_store ERROR                     [ 66%]
+tests/test_components.py::test_question_router FAILED                    [ 83%]
+tests/test_components.py::test_answerer PASSED                           [100%]
+
+=================================== ERRORS ====================================
+___________________ ERROR at setup of test_embedding_store ____________________
+file D:\Intership Projects\Rag_Movies\movie_rag\tests\test_components.py, line 85
+  def test_embedding_store(test_config, mock_embedding_model, temp_dirs):
+file D:\Intership Projects\Rag_Movies\movie_rag\tests\conftest.py, line 57
+  @pytest.fixture
+  def mock_embedding_model(mocker):
+E       fixture 'mocker' not found
+>       available fixtures: anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, cov, doctest_namespace, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, mock_embedding_model, monkeypatch, no_cover, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, sample_srt_content, temp_dirs, test_config, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+D:\Intership Projects\Rag_Movies\movie_rag\tests\conftest.py:57
+================================== FAILURES ===================================
+__________________________ test_metadata_store_crud ___________________________
+
+test_config = {'embedding': {'batch_size': 32, 'dimension': 384, 'model_name': 'mock-model', 'normalize': True, ...}, 'ingestion': {... 'processed': 'tests/temp_data/processed', 'raw_srt': 'tests/temp_data/raw', 'vector_db': 'tests/temp_vector_db'}, ...}
+
+    def test_metadata_store_crud(test_config):
+        """Test Create, Read, Search on MetadataStore."""
+        store = MetadataStore(":memory:")
+    
+        chunk = TranscriptChunk(
+            chunk_id="c1",
+            movie_id="m1",
+            start_time=TimeStamp(seconds=0),
+            end_time=TimeStamp(seconds=10),
+            text="This is a test chunk about explosions.",
+            metadata={"scene": 1}
+        )
+    
+        store.insert_chunks([chunk])
+    
+        # Retrieve
+>       retrieved = store.get_chunk("c1")
+
+tests\test_components.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <src.ingest.metadata_store.MetadataStore object at 0x0000011312B21160>
+chunk_id = 'c1'
+
+    def get_chunk(self, chunk_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a single chunk by ID.
+    
+        Args:
+            chunk_id: Chunk identifier
+    
+        Returns:
+            Chunk data as dict or None
+        """
+        conn = self._get_connection()
+        cursor = conn.cursor()
+    
+>       cursor.execute('''
+            SELECT chunk_id, movie_id, start_time, end_time, text, speaker, scene_id, metadata
+            FROM chunks
+            WHERE chunk_id = ?
+        ''', (chunk_id,))
+E       sqlite3.OperationalError: no such table: chunks
+
+src\ingest\metadata_store.py:160: OperationalError
+---------------------------- Captured stdout call -----------------------------
+2026-02-04 21:44:40,430 - src.ingest.metadata_store - INFO - Metadata store initialized at :memory:
+2026-02-04 21:44:40,430 - src.ingest.metadata_store - ERROR - Failed to insert chunk c1: no such table: chunks
+2026-02-04 21:44:40,431 - src.ingest.metadata_store - INFO - Inserted 0 chunks into metadata store
+____________________________ test_question_router _____________________________
+
+mock_client_cls = <MagicMock name='InferenceClient' id='1181429671760'>
+test_config = {'embedding': {'batch_size': 32, 'dimension': 384, 'model_name': 'mock-model', 'normalize': True, ...}, 'ingestion': {... 'processed': 'tests/temp_data/processed', 'raw_srt': 'tests/temp_data/raw', 'vector_db': 'tests/temp_vector_db'}, ...}
+
+    @patch('src.llm.router.InferenceClient')
+    def test_question_router(mock_client_cls, test_config):
+        """Test router parsing logic without api calls."""
+        mock_client = MagicMock()
+        mock_client_cls.return_value = mock_client
+    
+        # Mock return value usually has .choices[0].message.content
+        mock_response = MagicMock()
+        mock_response.choices[0].message.content = '{"category": "WHAT", "requires_full_narrative": false}'
+        mock_client.chat_completion.return_value = mock_response
+    
+>       router = QuestionRouter(test_config['llm']['router'])
+
+tests\test_components.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <src.llm.router.QuestionRouter object at 0x0000011312B75310>
+config = {'model': 'mock-router'}
+
+    def __init__(self, config: dict):
+        """
+        Initialize question router.
+    
+        Args:
+            config: LLM configuration dict
+        """
+        self.config = config
+        self.logger = logger
+    
+        self.model_name = os.getenv('ROUTER_MODEL', config.get('model'))
+        self.max_tokens = config.get('max_tokens', 200)
+        self.temperature = config.get('temperature', 0.1)
+        self.timeout = config.get('timeout', 30)
+    
+        # Initialize HF Inference Client
+        hf_token = os.getenv('HF_TOKEN')
+        if not hf_token:
+>           raise ValueError("HF_TOKEN environment variable not set")
+E           ValueError: HF_TOKEN environment variable not set
+
+src\llm\router.py:37: ValueError
+============================== warnings summary ===============================
+venv\Lib\site-packages\pydantic\_internal\_fields.py:149
+  D:\Intership Projects\Rag_Movies\movie_rag\venv\Lib\site-packages\pydantic\_internal\_fields.py:149: UserWarning: Field "model_used" has conflict with protected namespace "model_".
+  
+  You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
+    warnings.warn(
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_components.py::test_metadata_store_crud - sqlite3.Operation...
+FAILED tests/test_components.py::test_question_router - ValueError: HF_TOKEN ...
+ERROR tests/test_components.py::test_embedding_store
+============== 2 failed, 3 passed, 3 warnings, 1 error in 8.45s ===============
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

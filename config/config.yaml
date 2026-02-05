@@ -1,0 +1,105 @@
+system:
+  name: "Movie Transcript RAG"
+  version: "1.0.0"
+
+paths:
+  raw_srt: "data/raw_srt"
+  processed: "data/processed"
+  vector_db: "data/processed/vector_db"
+  metadata_db: "data/processed/metadata.db"
+  logs: "logs"
+
+ingestion:
+  # Chunking strategy
+  chunking_strategy: "scene_aware"  # scene_aware or fixed_time
+  max_chunk_seconds: 120  # 2 minutes max per chunk
+  min_chunk_seconds: 10   # 10 seconds min per chunk
+  overlap_seconds: 5      # overlap for context continuity
+  
+  # Scene detection
+  scene_break_threshold: 3.0  # seconds of silence = new scene
+  
+embedding:
+  model_name: "BAAI/bge-base-en-v1.5"  # Override with env var
+  dimension: 768
+  batch_size: 32
+  normalize: true
+
+retrieval:
+  semantic:
+    top_k: 40
+    similarity_threshold: 0.3
+  
+  keyword:
+    top_k: 30
+    min_match_score: 0.5
+    enable_fuzzy: true
+  
+  hybrid:
+    merge_strategy: "rrf"  # reciprocal rank fusion
+    max_final_chunks: 25
+    preserve_order: true  # keep temporal order
+
+llm:
+  router:
+    model: "HuggingFaceH4/zephyr-7b-beta"
+    max_tokens: 200
+    temperature: 0.1
+    timeout: 30
+    
+  judge:
+    model: "HuggingFaceH4/zephyr-7b-beta"
+    max_tokens: 500
+    temperature: 0.1
+    batch_size: 5
+    timeout: 45
+    
+  distiller:
+    model: "HuggingFaceH4/zephyr-7b-beta"
+    max_tokens: 1000
+    temperature: 0.2
+    compression_ratio: 0.6
+    timeout: 60
+    
+  answerer:
+    primary_model: "meta-llama/Llama-2-70b-chat-hf"
+    fallback_model: "meta-llama/Llama-2-13b-chat-hf"
+    max_tokens: 1500
+    temperature: 0.3
+    timeout: 90
+    max_retries: 2
+
+prompts:
+  router:
+    system: |
+      You are a question classifier for a movie transcript QA system.
+      Classify the question into ONE category: WHY, BEFORE, AFTER, WHAT, QUOTE, SUMMARY.
+      Return ONLY valid JSON with format: {"category": "WHAT", "requires_full_narrative": false}
+      
+  judge:
+    system: |
+      You are a relevance judge. Given a question and transcript chunks, identify which chunks are relevant.
+      Return ONLY valid JSON with format: {"relevant_chunk_ids": [1, 3, 5, ...]}
+      
+  distiller:
+    system: |
+      You are a context distiller. Compress the given transcript chunks while preserving:
+      - Key facts and dialogue
+      - Character names and actions
+      - Timestamps
+      Keep it concise but complete.
+      
+  answerer:
+    system: |
+      You are answering questions about a movie based ONLY on the provided transcript context.
+      Rules:
+      1. Answer ONLY from the given context
+      2. Always cite timestamps when possible
+      3. If the answer is not in the context, say "I cannot find this information in the transcript"
+      4. Be specific and accurate
+
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/movie_rag.log"
+  console: true
