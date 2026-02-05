@@ -167,8 +167,6 @@ class Answerer:
                         {"role": "user", "content": user_prompt}
                     ],
                     max_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    max_tokens=self.max_tokens,
                     temperature=self.temperature
                 )
                 answer_text = response.choices[0].message.content.strip()

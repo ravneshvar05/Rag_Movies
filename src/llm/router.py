@@ -65,8 +65,6 @@ class QuestionRouter:
                     {"role": "user", "content": user_prompt}
                 ],
                 max_tokens=self.max_tokens,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
                 temperature=self.temperature
             )
             
