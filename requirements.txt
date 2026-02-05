@@ -1,25 +1,33 @@
-# Core
+# Core dependencies
 python-dotenv==1.0.0
 pyyaml==6.0.1
 
-# Embeddings & retrieval
-sentence-transformers==2.6.1
-faiss-cpu==1.7.4
-rank-bm25==0.2.2
-rapidfuzz==3.6.1
+# Vector DB and embeddings
+faiss-cpu # installed 1.13.2
+chromadb # installed 1.4.1
+sentence-transformers==2.3.1
 
-# ML basics
-torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
-numpy<2.0
-scikit-learn==1.4.0
+# LLM and HuggingFace
+huggingface-hub==0.20.3
+transformers==4.37.2
+torch # installed 2.10.0
 
 # Database
 sqlalchemy==2.0.25
 
-# API / utils
+# NLP utilities
+nltk==3.8.1
+spacy==3.7.2
+
+# API clients
 requests==2.31.0
-groq
+groq # for fast Llama inference
+
+# Utilities
 tqdm==4.66.1
+streamlit==1.31.0 # Frontend
 pydantic==2.5.3
 
-
+# Testing
+pytest==7.4.4
+pytest-cov==4.1.0
