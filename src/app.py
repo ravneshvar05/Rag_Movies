@@ -140,6 +140,10 @@ if prompt := st.chat_input("Ask a question about the movie..."):
                 if result.answer.supporting_timestamps:
                     meta_info += f" | **Timestamps:** {', '.join(result.answer.supporting_timestamps)}"
                 
+                # Display Token Usage
+                if result.token_usage:
+                    meta_info += f" | **Tokens:** {result.token_usage.total_tokens} (Prompt: {result.token_usage.prompt_tokens}, Completion: {result.token_usage.completion_tokens})"
+                
                 full_response = answer_text + meta_info
                 
                 st.markdown(full_response)

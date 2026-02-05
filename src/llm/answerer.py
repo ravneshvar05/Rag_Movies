@@ -6,7 +6,7 @@ import time
 from typing import Optional
 from huggingface_hub import InferenceClient
 from groq import Groq
-from src.models.schemas import DistilledContext, Answer
+from src.models.schemas import DistilledContext, Answer, TokenUsage
 from src.utils.logger import MovieRAGLogger
 
 logger = MovieRAGLogger.get_logger(__name__)
@@ -186,13 +186,23 @@ class Answerer:
             # Determine confidence
             confidence = self._assess_confidence(answer_text, context)
             
+            # Extract token usage
+            token_usage = None
+            if hasattr(response, 'usage') and response.usage:
+                token_usage = TokenUsage(
+                    prompt_tokens=response.usage.prompt_tokens,
+                    completion_tokens=response.usage.completion_tokens,
+                    total_tokens=response.usage.total_tokens
+                )
+
             answer = Answer(
                 question=question,
                 answer=answer_text,
                 supporting_timestamps=supporting_timestamps,
                 confidence=confidence,
                 source_chunk_ids=[],  # Could be populated from context
-                model_used=model_name
+                model_used=model_name,
+                token_usage=token_usage
             )
             
             self.logger.info(f"Answer generated successfully with {model_name}")

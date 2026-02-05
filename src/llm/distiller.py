@@ -4,7 +4,7 @@ LLM-based context distiller for compressing chunks.
 import os
 from typing import List
 from huggingface_hub import InferenceClient
-from src.models.schemas import TranscriptChunk, DistilledContext
+from src.models.schemas import TranscriptChunk, DistilledContext, TokenUsage
 from src.utils.logger import MovieRAGLogger
 
 logger = MovieRAGLogger.get_logger(__name__)
@@ -97,11 +97,21 @@ class ContextDistiller:
             # Extract timestamps mentioned in distilled text
             preserved_timestamps = self._extract_timestamps(distilled_text, chunks)
             
+            # Extract token usage
+            token_usage = None
+            if hasattr(response, 'usage') and response.usage:
+                token_usage = TokenUsage(
+                    prompt_tokens=response.usage.prompt_tokens,
+                    completion_tokens=response.usage.completion_tokens,
+                    total_tokens=response.usage.total_tokens
+                )
+            
             result = DistilledContext(
                 original_chunk_count=len(chunks),
                 distilled_text=distilled_text,
                 preserved_timestamps=preserved_timestamps,
-                key_facts=[]  # Could extract key facts if needed
+                key_facts=[],  # Could extract key facts if needed
+                token_usage=token_usage
             )
             
             self.logger.info(

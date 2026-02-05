@@ -74,7 +74,17 @@ class QuestionRouter:
             # Parse JSON response
             route_data = self._parse_response(response_text)
             
-            route = QuestionRoute(**route_data)
+            # Extract token usage
+            token_usage = None
+            if hasattr(response, 'usage') and response.usage:
+                from src.models.schemas import TokenUsage
+                token_usage = TokenUsage(
+                    prompt_tokens=response.usage.prompt_tokens,
+                    completion_tokens=response.usage.completion_tokens,
+                    total_tokens=response.usage.total_tokens
+                )
+            
+            route = QuestionRoute(**route_data, token_usage=token_usage)
             
             self.logger.info(f"Question routed to: {route.category}")
             

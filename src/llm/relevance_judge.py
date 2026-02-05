@@ -5,7 +5,7 @@ import json
 import os
 from typing import List
 from huggingface_hub import InferenceClient
-from src.models.schemas import TranscriptChunk, RelevanceJudgment
+from src.models.schemas import TranscriptChunk, RelevanceJudgment, TokenUsage
 from src.utils.logger import MovieRAGLogger
 
 logger = MovieRAGLogger.get_logger(__name__)
@@ -69,12 +69,16 @@ class RelevanceJudge:
         if len(chunks) > 20:
             # For large numbers, judge in batches
             all_relevant = []
+            total_usage = TokenUsage()
+            
             for i in range(0, len(chunks), 20):
                 batch = chunks[i:i+20]
                 judgment = self._judge_batch(question, batch, system_prompt)
                 all_relevant.extend(judgment.relevant_chunk_ids)
+                if judgment.token_usage:
+                    total_usage.add(judgment.token_usage)
             
-            return RelevanceJudgment(relevant_chunk_ids=all_relevant)
+            return RelevanceJudgment(relevant_chunk_ids=all_relevant, token_usage=total_usage)
         else:
             return self._judge_batch(question, chunks, system_prompt)
     
@@ -103,7 +107,16 @@ class RelevanceJudge:
             # Parse response
             judgment_data = self._parse_response(response_text, chunks)
             
-            judgment = RelevanceJudgment(**judgment_data)
+            # Extract token usage
+            token_usage = None
+            if hasattr(response, 'usage') and response.usage:
+                token_usage = TokenUsage(
+                    prompt_tokens=response.usage.prompt_tokens,
+                    completion_tokens=response.usage.completion_tokens,
+                    total_tokens=response.usage.total_tokens
+                )
+            
+            judgment = RelevanceJudgment(**judgment_data, token_usage=token_usage)
             
             self.logger.info(
                 f"Judged {len(judgment.relevant_chunk_ids)} / {len(chunks)} "

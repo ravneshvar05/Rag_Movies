@@ -3,7 +3,7 @@ Main RAG pipeline orchestrating all components.
 """
 import time
 from typing import Optional
-from src.models.schemas import RAGResult, QuestionRoute, Answer
+from src.models.schemas import RAGResult, QuestionRoute, Answer, TokenUsage
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.llm.router import QuestionRouter
 from src.llm.relevance_judge import RelevanceJudge
@@ -59,6 +59,7 @@ class RAGPipeline:
         Returns:
             RAGResult with answer and metadata
         """
+        starting_tokens = TokenUsage()
         start_time = time.time()
         
         self.logger.info(f"\n{'='*80}")
@@ -70,7 +71,10 @@ class RAGPipeline:
             self.logger.info("\n[STEP 1] Routing question...")
             route = self.router.route(question)
             self.logger.info(f"Category: {route.category}")
+            self.logger.info(f"Category: {route.category}")
             self.logger.info(f"Requires full narrative: {route.requires_full_narrative}")
+            if route.token_usage:
+                starting_tokens.add(route.token_usage)
             
             # Step 2: Retrieve relevant chunks
             self.logger.info("\n[STEP 2] Retrieving chunks...")
@@ -87,6 +91,8 @@ class RAGPipeline:
             # Step 3: Judge relevance
             self.logger.info("\n[STEP 3] Judging relevance...")
             judgment = self.judge.judge(question, retrieved_chunks)
+            if judgment.token_usage:
+                starting_tokens.add(judgment.token_usage)
             
             # Filter to relevant chunks
             relevant_chunk_ids = set(judgment.relevant_chunk_ids)
@@ -111,12 +117,17 @@ class RAGPipeline:
                 f"Distilled {distilled_context.original_chunk_count} chunks "
                 f"into {len(distilled_context.distilled_text)} characters"
             )
+            if distilled_context.token_usage:
+                starting_tokens.add(distilled_context.token_usage)
             
             # Step 5: Generate answer
             self.logger.info("\n[STEP 5] Generating answer...")
             answer = self.answerer.answer(question, distilled_context)
             self.logger.info(f"Answer generated with model: {answer.model_used}")
+            self.logger.info(f"Answer generated with model: {answer.model_used}")
             self.logger.info(f"Confidence: {answer.confidence}")
+            if answer.token_usage:
+                starting_tokens.add(answer.token_usage)
             
             # Create result
             processing_time = time.time() - start_time
@@ -130,8 +141,10 @@ class RAGPipeline:
                 processing_time=processing_time,
                 metadata={
                     'movie_id': movie_id,
+                    'movie_id': movie_id,
                     'distilled_context_length': len(distilled_context.distilled_text)
-                }
+                },
+                token_usage=starting_tokens
             )
             
             self.logger.info(f"\n{'='*80}")

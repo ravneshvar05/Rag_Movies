@@ -77,12 +77,14 @@ class QuestionRoute(BaseModel):
     category: str  # WHY, BEFORE, AFTER, WHAT, QUOTE, SUMMARY
     requires_full_narrative: bool = False
     key_entities: List[str] = Field(default_factory=list)
+    token_usage: Optional["TokenUsage"] = None
     
     
 class RelevanceJudgment(BaseModel):
     """Relevance judgment for retrieved chunks."""
     relevant_chunk_ids: List[str]
     confidence_scores: Optional[List[float]] = None
+    token_usage: Optional["TokenUsage"] = None
     
 
 class DistilledContext(BaseModel):
@@ -91,6 +93,7 @@ class DistilledContext(BaseModel):
     distilled_text: str
     preserved_timestamps: List[str]
     key_facts: List[str] = Field(default_factory=list)
+    token_usage: Optional["TokenUsage"] = None
     
 
 class Answer(BaseModel):
@@ -101,8 +104,22 @@ class Answer(BaseModel):
     confidence: Optional[str] = None  # high, medium, low
     source_chunk_ids: List[str] = Field(default_factory=list)
     model_used: str = ""
+    token_usage: Optional["TokenUsage"] = None
     
     
+class TokenUsage(BaseModel):
+    """Token usage statistics."""
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+    
+    def add(self, other: "TokenUsage"):
+        """Add another usage object to this one."""
+        self.prompt_tokens += other.prompt_tokens
+        self.completion_tokens += other.completion_tokens
+        self.total_tokens += other.total_tokens
+
+
 class RAGResult(BaseModel):
     """Complete RAG pipeline result."""
     question: str
@@ -111,4 +128,5 @@ class RAGResult(BaseModel):
     relevant_chunks: int
     answer: Answer
     processing_time: float
+    token_usage: TokenUsage = Field(default_factory=TokenUsage)
     metadata: Dict[str, Any] = Field(default_factory=dict)
