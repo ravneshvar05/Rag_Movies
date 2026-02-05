@@ -1,33 +1,62 @@
-# Core dependencies
+# # Core dependencies
+# python-dotenv==1.0.0
+# pyyaml==6.0.1
+
+# # Vector DB and embeddings
+# faiss-cpu # installed 1.13.2
+# chromadb # installed 1.4.1
+# sentence-transformers==2.3.1
+
+# # LLM and HuggingFace
+# huggingface-hub==0.20.3
+# transformers==4.37.2
+# torch # installed 2.10.0
+
+# # Database
+# sqlalchemy==2.0.25
+
+# # NLP utilities
+# nltk==3.8.1
+# spacy==3.7.2
+
+# # API clients
+# requests==2.31.0
+# groq # for fast Llama inference
+
+# # Utilities
+# tqdm==4.66.1
+# streamlit==1.31.0 # Frontend
+# pydantic==2.5.3
+
+# # Testing
+# pytest==7.4.4
+# pytest-cov==4.1.0
+
+# Core
 python-dotenv==1.0.0
 pyyaml==6.0.1
 
-# Vector DB and embeddings
-faiss-cpu # installed 1.13.2
-chromadb # installed 1.4.1
+# Embeddings & Vector Search
+faiss-cpu==1.7.4
 sentence-transformers==2.3.1
 
-# LLM and HuggingFace
+# LLM / APIs
 huggingface-hub==0.20.3
 transformers==4.37.2
-torch # installed 2.10.0
+groq==0.9.0
 
 # Database
 sqlalchemy==2.0.25
 
 # NLP utilities
 nltk==3.8.1
-spacy==3.7.2
-
-# API clients
-requests==2.31.0
-groq # for fast Llama inference
 
 # Utilities
 tqdm==4.66.1
-streamlit==1.31.0 # Frontend
 pydantic==2.5.3
 
-# Testing
-pytest==7.4.4
-pytest-cov==4.1.0
+# Frontend
+streamlit==1.31.0
+
+# Networking
+requests==2.31.0
