@@ -37,7 +37,8 @@ class EmbeddingStore:
         
         # Initialize embedding model
         self.logger.info(f"Loading embedding model: {self.model_name}")
-        self.model = SentenceTransformer(self.model_name)
+        # Force CPU to avoid issues with metadata tensors on HF Spaces free tier
+        self.model = SentenceTransformer(self.model_name, device="cpu")
         
         # Initialize FAISS index
         self.index = None
