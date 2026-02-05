@@ -12,8 +12,12 @@ from dotenv import load_dotenv
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-# Detect HuggingFace Spaces
-IS_HF_SPACE = os.getenv("SPACE_ID") is not None
+# Detect HuggingFace Spaces using multiple methods
+IS_HF_SPACE = (
+    os.getenv("SPACE_ID") is not None or 
+    os.getenv("SYSTEM") == "spaces" or
+    os.getenv("SPACE_AUTHOR_NAME") is not None
+)
 DATA_DIR = Path("/data") if IS_HF_SPACE else Path("data/processed")
 
 from src.utils.logger import MovieRAGLogger
