@@ -25,6 +25,7 @@ class EmbeddingStore:
             config: Configuration dict
         """
         self.config = config
+        self.logger = logger  # Initialize logger first!
         
         # Auto-detect environment and choose appropriate model
         import os
@@ -46,8 +47,6 @@ class EmbeddingStore:
         
         self.store_path = Path(config.get('store_path', 'data/processed/vector_db'))
         self.store_path.mkdir(parents=True, exist_ok=True)
-        
-        self.logger = logger
         
         # Initialize embedding model
         self.logger.info(f"Loading embedding model: {self.model_name}")
