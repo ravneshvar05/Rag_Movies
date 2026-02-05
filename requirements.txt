@@ -1,8 +1,25 @@
+# Core
 python-dotenv==1.0.0
 pyyaml==6.0.1
 
+# Embeddings & retrieval
+sentence-transformers==2.6.1
+faiss-cpu==1.7.4
+rank-bm25==0.2.2
+rapidfuzz==3.6.1
+
+# ML basics
+torch==2.1.2 --index-url https://download.pytorch.org/whl/cpu
+numpy<2.0
+scikit-learn==1.4.0
+
+# Database
+sqlalchemy==2.0.25
+
+# API / utils
 requests==2.31.0
+groq
 tqdm==4.66.1
 pydantic==2.5.3
 
-groq
+
