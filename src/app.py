@@ -74,6 +74,11 @@ with st.sidebar:
                     ingest_srt(str(temp_path), movie_id_input, config)
                     st.write("Chunking and Embedding...")
                     time.sleep(1) # UX pause
+                    
+                    # Clear cached pipeline to force reload with new embeddings
+                    st.session_state.pipeline = None
+                    st.session_state.metadata_store = None
+                    
                     status.update(label="Ingestion Complete!", state="complete", expanded=False)
                     st.success(f"Successfully ingested {movie_id_input}!")
                     st.rerun() # Refresh to show in list
