@@ -1,32 +1,26 @@
-# Core dependencies
+# Core
 python-dotenv==1.0.0
 pyyaml==6.0.1
 
-# Vector DB and embeddings
-faiss-cpu
-chromadb
-sentence-transformers==2.3.1
+# Embeddings & retrieval
+sentence-transformers==2.6.1
+faiss-cpu==1.7.4
+rank-bm25==0.2.2
+rapidfuzz==3.6.1
 
-# LLM and HuggingFace
-huggingface-hub==0.20.3
-transformers==4.37.2
-torch --index-url https://download.pytorch.org/whl/cpu
+# ML basics
+torch==2.1.2
+numpy<2.0
+scikit-learn==1.4.0
 
 # Database
 sqlalchemy==2.0.25
 
-# NLP utilities
-nltk==3.8.1
-
-# API clients
+# API / utils
 requests==2.31.0
 groq
-
-# Utilities
 tqdm==4.66.1
-streamlit==1.31.0
 pydantic==2.5.3
 
-# Testing
-pytest==7.4.4
-pytest-cov==4.1.0
+# UI
+streamlit==1.31.0
