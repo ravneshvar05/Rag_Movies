@@ -4,7 +4,6 @@ LLM-based relevance judge for filtering chunks.
 import json
 import os
 from typing import List
-from huggingface_hub import InferenceClient
 from groq import Groq
 from src.models.schemas import TranscriptChunk, RelevanceJudgment, TokenUsage
 from src.utils.logger import MovieRAGLogger
@@ -33,28 +32,12 @@ class RelevanceJudge:
         self.batch_size = config.get('batch_size', 5)
         self.timeout = config.get('timeout', 45)
         
-        # Initialize Clients - Try both Groq and HuggingFace
-        self.groq_client = None
-        self.hf_client = None
-        
-        # 1. Try Groq First
+        # Initialize Groq Client
         groq_key = os.getenv('GROQ_API_KEY')
-        if groq_key:
-            try:
-                self.groq_client = Groq(api_key=groq_key)
-                self.logger.info("Initialized Groq Client for Judge")
-            except Exception as e:
-                self.logger.warning(f"Failed to initialize Groq client: {e}")
+        if not groq_key:
+            raise ValueError("GROQ_API_KEY environment variable not set")
         
-        # 2. Setup HF Client (for fallback)
-        hf_token = os.getenv('HF_TOKEN')
-        if hf_token:
-            self.hf_client = InferenceClient(token=hf_token)
-            self.logger.info("Initialized HuggingFace Client for Judge")
-        
-        if not self.groq_client and not self.hf_client:
-            raise ValueError("No valid LLM credentials found (HF_TOKEN or GROQ_API_KEY required)")
-        
+        self.groq_client = Groq(api_key=groq_key)
         self.logger.info(f"Judge initialized with model: {self.model_name}")
     
     def judge(
@@ -109,33 +92,16 @@ class RelevanceJudge:
         user_prompt = self._build_user_prompt(question, chunks)
         
         try:
-            # Choose client based on model name
-            is_groq_model = self.model_name and ('llama' in self.model_name.lower() or 'mixtral' in self.model_name.lower())
-            
-            if is_groq_model and self.groq_client:
-                # Use Groq API
-                response = self.groq_client.chat.completions.create(
-                    model=self.model_name,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature
-                )
-            elif self.hf_client:
-                # Use HuggingFace API
-                response = self.hf_client.chat_completion(
-                    model=self.model_name,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature
-                )
-            else:
-                raise ValueError("No compatible client available for model")
+            # Use Groq API
+            response = self.groq_client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                max_tokens=self.max_tokens,
+                temperature=self.temperature
+            )
             
             response_text = response.choices[0].message.content.strip()
             

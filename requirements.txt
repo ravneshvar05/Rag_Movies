@@ -37,12 +37,12 @@ python-dotenv==1.0.0
 pyyaml==6.0.1
 
 # Embeddings & Vector Search
-faiss-cpu==1.7.4
+faiss-cpu>=1.8.0
 sentence-transformers==2.3.1
 
-# LLM / Transformers (CRITICAL FIX)
-huggingface-hub==0.20.3
-transformers==4.37.2
+# LLM / Transformers
+# Use version compatible with sentence-transformers 2.3.1 and huggingface-hub
+transformers==4.38.0  # Last stable version before breaking changes
 # groq==0.9.0
 groq
 

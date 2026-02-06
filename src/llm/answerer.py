@@ -4,7 +4,6 @@ Final answer generation using LLaMA models with fallback.
 import os
 import time
 from typing import Optional
-from huggingface_hub import InferenceClient
 from groq import Groq
 from src.models.schemas import DistilledContext, Answer, TokenUsage
 from src.utils.logger import MovieRAGLogger
@@ -41,30 +40,12 @@ class Answerer:
         self.max_retries = config.get('max_retries', 2)
         self.timeout = config.get('timeout', 90)
         
-        # Initialize Clients
-        self.groq_client = None
-        self.hf_client = None
-        
-        # 1. Try Groq First
+        # Initialize Groq Client
         groq_key = os.getenv('GROQ_API_KEY')
-        if groq_key:
-            try:
-                self.groq_client = Groq(api_key=groq_key)
-                self.logger.info("Initialized Groq Client for Answerer")
-            except Exception as e:
-                self.logger.warning(f"Failed to initialize Groq client: {e}")
+        if not groq_key:
+            raise ValueError("GROQ_API_KEY environment variable not set")
         
-        # 2. Setup HF Client (for fallback or primary if Groq missing)
-        hf_token = os.getenv('HF_TOKEN')
-        if hf_token:
-            self.hf_client = InferenceClient(token=hf_token)
-            self.logger.info("Initialized HuggingFace Client")
-        else:
-            self.logger.warning("HF_TOKEN not set. HuggingFace fallback invalid.")
-
-        if not self.groq_client and not self.hf_client:
-             raise ValueError("No valid LLM credentials found (HF_TOKEN or GROQ_API_KEY required)")
-            
+        self.groq_client = Groq(api_key=groq_key)
         self.logger.info(
             f"Answerer initialized: primary={self.primary_model}, "
             f"fallback={self.fallback_model}"
@@ -157,22 +138,8 @@ class Answerer:
                      temperature=self.temperature,
                  )
                  answer_text = response.choices[0].message.content.strip()
-
-            # 2. Try HuggingFace Generation
-            elif self.hf_client:
-                response = self.hf_client.chat_completion(
-                    model=model_name,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature
-                )
-                answer_text = response.choices[0].message.content.strip()
-            
             else:
-                self.logger.error("No compatible client found for generation")
+                self.logger.error("Groq client not initialized")
                 return None
             
             # Extract timestamps from answer
