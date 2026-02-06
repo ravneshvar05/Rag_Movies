@@ -42,20 +42,20 @@ retrieval:
 
 llm:
   router:
-    model: "HuggingFaceH4/zephyr-7b-beta"
+    model: "llama-3.1-8b-instant"  # Groq: Fast, reliable API
     max_tokens: 200
     temperature: 0.1
     timeout: 30
     
   judge:
-    model: "HuggingFaceH4/zephyr-7b-beta"
+    model: "llama-3.1-8b-instant"  # Groq: Fast, reliable API
     max_tokens: 500
     temperature: 0.1
     batch_size: 5
     timeout: 45
     
   distiller:
-    model: "HuggingFaceH4/zephyr-7b-beta"
+    model: "llama-3.1-8b-instant"  # Groq: Fast, reliable API
     max_tokens: 1000
     temperature: 0.2
     compression_ratio: 0.6
