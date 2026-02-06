@@ -31,16 +31,24 @@ class EmbeddingStore:
         import os
         is_huggingface_space = os.getenv("SPACE_ID") is not None
         
-        if is_huggingface_space:
-            # Use lightweight model for HuggingFace Spaces (limited RAM)
-            self.model_name = "sentence-transformers/all-MiniLM-L6-v2"
-            self.dimension = 384  # Smaller dimension for lightweight model
-            self.logger.info("🌐 Running on HuggingFace Spaces - using lightweight model")
-        else:
-            # Use full-size model for local deployment
-            self.model_name = config.get('model_name', 'BAAI/bge-base-en-v1.5')
-            self.dimension = config.get('dimension', 768)
-            self.logger.info("💻 Running locally - using full-size model")
+        # TESTING: Using BGE model on HuggingFace (may cause OOM on free tier)
+        # TO REVERT: Uncomment lines below and comment out lines 47-48
+        # if is_huggingface_space:
+        #     # Use lightweight model for HuggingFace Spaces (limited RAM)
+        #     self.model_name = "sentence-transformers/all-MiniLM-L6-v2"
+        #     self.dimension = 384  # Smaller dimension for lightweight model
+        #     self.logger.info("🌐 Running on HuggingFace Spaces - using lightweight model")
+        # else:
+        #     # Use full-size model for local deployment
+        #     self.model_name = config.get('model_name', 'BAAI/bge-base-en-v1.5')
+        #     self.dimension = config.get('dimension', 768)
+        #     self.logger.info("💻 Running locally - using full-size model")
+        
+        # Use config model everywhere (local + HuggingFace)
+        self.model_name = config.get('model_name', 'BAAI/bge-base-en-v1.5')
+        self.dimension = config.get('dimension', 768)
+        env_label = "HuggingFace Spaces" if is_huggingface_space else "locally"
+        self.logger.info(f"🚀 Running {env_label} - using BGE model (768-dim)")
         
         self.normalize = config.get('normalize', True)
         self.batch_size = config.get('batch_size', 32)
@@ -68,10 +76,39 @@ class EmbeddingStore:
         
         if index_path.exists() and metadata_path.exists():
             self.logger.info("Loading existing FAISS index")
-            self.index = faiss.read_index(str(index_path))
-            with open(metadata_path, 'rb') as f:
-                self.chunk_ids = pickle.load(f)
-            self.logger.info(f"Loaded index with {len(self.chunk_ids)} vectors")
+            try:
+                loaded_index = faiss.read_index(str(index_path))
+                
+                # CRITICAL: Check dimension mismatch (e.g., switching from 384 to 768)
+                if loaded_index.d != self.dimension:
+                    self.logger.warning(
+                        f"⚠️ Dimension mismatch! Existing index: {loaded_index.d}, "
+                        f"Current model: {self.dimension}. Recreating index..."
+                    )
+                    # Delete old index files
+                    index_path.unlink()
+                    metadata_path.unlink()
+                    self.logger.info("Deleted old index files")
+                    # Create new index
+                    if self.normalize:
+                        self.index = faiss.IndexFlatIP(self.dimension)
+                    else:
+                        self.index = faiss.IndexFlatL2(self.dimension)
+                    self.chunk_ids = []
+                else:
+                    # Dimensions match, use loaded index
+                    self.index = loaded_index
+                    with open(metadata_path, 'rb') as f:
+                        self.chunk_ids = pickle.load(f)
+                    self.logger.info(f"✅ Loaded index with {len(self.chunk_ids)} vectors (dim={self.dimension})")
+            except Exception as e:
+                self.logger.error(f"Failed to load index: {e}. Creating new one...")
+                # Create new index on failure
+                if self.normalize:
+                    self.index = faiss.IndexFlatIP(self.dimension)
+                else:
+                    self.index = faiss.IndexFlatL2(self.dimension)
+                self.chunk_ids = []
         else:
             self.logger.info("Creating new FAISS index")
             # Use IndexFlatIP for cosine similarity (with normalized vectors)
