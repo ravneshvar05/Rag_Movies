@@ -78,6 +78,16 @@ class RelevanceJudge:
                 if judgment.token_usage:
                     total_usage.add(judgment.token_usage)
             
+            
+            # Safety: Ensure minimum chunks even if Judge is too strict
+            if len(all_relevant) < 3 and len(chunks) >= 3:
+                self.logger.warning(
+                    f"Judge returned only {len(all_relevant)} chunks, adding top-ranked fallback chunks"
+                )
+                # Add first 3 chunks as fallback (they're sorted by retrieval rank)
+                fallback_ids = [c.chunk_id for c in chunks[:3] if c.chunk_id not in all_relevant]
+                all_relevant.extend(fallback_ids[:3 - len(all_relevant)])
+            
             return RelevanceJudgment(relevant_chunk_ids=all_relevant, token_usage=total_usage)
         else:
             return self._judge_batch(question, chunks, system_prompt)
@@ -140,8 +150,11 @@ Given a question and transcript chunks, identify which chunks contain informatio
 
 A chunk is relevant if it contains:
 - Direct information to answer the question
-- Context necessary to understand the answer
+- Context necessary to understand the answer  
 - Related events, characters, or dialogue mentioned in the question
+- **For location questions (WHERE): Include chunks mentioning places, settings, or character movements**
+- **For temporal questions (BEFORE, AFTER, "at the start", "at the end"): Include surrounding chunks for full context**
+- **When uncertain whether a chunk is relevant, INCLUDE it** (better to have extra context than miss critical information)
 
 Return ONLY valid JSON with this exact format:
 {"relevant_chunk_ids": ["chunk_0001", "chunk_0003", "chunk_0010"]}
@@ -161,7 +174,7 @@ Do not include explanations, only the JSON with chunk IDs."""
             prompt_parts.append(
                 f"\nChunk ID: {chunk.chunk_id}\n"
                 f"Timestamp: {timestamp}\n"
-                f"Text: {chunk.text[:300]}...\n"  # Truncate for context window
+                f"Text: {chunk.text[:800]}...\n"  # Increased from 300 to see more context
             )
         
         prompt_parts.append(

@@ -5,7 +5,6 @@ import pickle
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Optional
 import numpy as np
-from sentence_transformers import SentenceTransformer
 from src.models.schemas import TranscriptChunk, TimeStamp
 from src.utils.logger import MovieRAGLogger
 
@@ -59,6 +58,7 @@ class EmbeddingStore:
         # Initialize embedding model
         self.logger.info(f"Loading embedding model: {self.model_name}")
         # Force CPU to avoid issues with metadata tensors on HF Spaces free tier
+        from sentence_transformers import SentenceTransformer
         self.model = SentenceTransformer(self.model_name, device="cpu")
         
         # Initialize FAISS index

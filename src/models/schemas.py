@@ -106,6 +106,10 @@ class Answer(BaseModel):
     model_used: str = ""
     token_usage: Optional["TokenUsage"] = None
     
+    model_config = {
+        "protected_namespaces": ()
+    }
+    
     
 class TokenUsage(BaseModel):
     """Token usage statistics."""

@@ -2,11 +2,18 @@
 Main entry point for the Movie Transcript RAG system.
 """
 import os
+print("[INFO] Setting offline mode programmatically...")
+os.environ['HF_HUB_OFFLINE'] = '1'
+os.environ['TRANSFORMERS_OFFLINE'] = '1'
+
 import sys
 import yaml
 import argparse
 from pathlib import Path
 from dotenv import load_dotenv
+
+# Load environment variables FIRST
+load_dotenv()
 
 # Add src to path
 # Add project root to path
@@ -19,19 +26,6 @@ IS_HF_SPACE = (
     os.getenv("SPACE_AUTHOR_NAME") is not None
 )
 DATA_DIR = Path("/data") if IS_HF_SPACE else Path("data/processed")
-
-from src.utils.logger import MovieRAGLogger
-from src.ingest.srt_parser import SRTParser
-from src.ingest.chunker import TranscriptChunker
-from src.ingest.metadata_store import MetadataStore
-from src.retrieval.embedding_store import EmbeddingStore
-from src.retrieval.keyword_search import KeywordSearch
-from src.retrieval.hybrid_retriever import HybridRetriever
-from src.llm.router import QuestionRouter
-from src.llm.relevance_judge import RelevanceJudge
-from src.llm.distiller import ContextDistiller
-from src.llm.answerer import Answerer
-from src.pipeline.rag_pipeline import RAGPipeline
 
 
 def load_config(config_path: str = "config/config.yaml") -> dict:
@@ -50,6 +44,18 @@ def initialize_system(config: dict):
     Returns:
         Tuple of (pipeline, metadata_store, embedding_store)
     """
+    # Lazy imports to avoid slow startup
+    from src.utils.logger import MovieRAGLogger
+    from src.ingest.metadata_store import MetadataStore
+    from src.retrieval.embedding_store import EmbeddingStore
+    from src.retrieval.keyword_search import KeywordSearch
+    from src.retrieval.hybrid_retriever import HybridRetriever
+    from src.llm.router import QuestionRouter
+    from src.llm.relevance_judge import RelevanceJudge
+    from src.llm.distiller import ContextDistiller
+    from src.llm.answerer import Answerer
+    from src.pipeline.rag_pipeline import RAGPipeline
+
     # Setup logging
     MovieRAGLogger.setup_logging(config)
     logger = MovieRAGLogger.get_logger(__name__)
@@ -120,6 +126,10 @@ def ingest_srt(srt_path: str, movie_id: str, config: dict):
         movie_id: Unique movie identifier
         config: Configuration dictionary
     """
+    from src.utils.logger import MovieRAGLogger
+    from src.ingest.srt_parser import SRTParser
+    from src.ingest.chunker import TranscriptChunker
+    
     logger = MovieRAGLogger.get_logger(__name__)
     
     logger.info(f"Ingesting SRT file: {srt_path}")
@@ -157,6 +167,7 @@ def interactive_mode(config: dict):
     Args:
         config: Configuration dictionary
     """
+    from src.utils.logger import MovieRAGLogger
     logger = MovieRAGLogger.get_logger(__name__)
     
     pipeline, _, _ = initialize_system(config)

@@ -12,6 +12,12 @@ load_dotenv()
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+# Suppress benign Streamlit/PyTorch warnings
+import logging
+logging.getLogger("streamlit.watcher.local_sources_watcher").setLevel(logging.ERROR)
+import warnings
+warnings.filterwarnings("ignore", message=".*torch.classes.*")
+
 from src.main import initialize_system, ingest_srt
 from src.utils.logger import MovieRAGLogger
 
