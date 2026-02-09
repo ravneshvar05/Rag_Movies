@@ -69,10 +69,8 @@ class ContextDistiller:
         
         self.logger.info(f"Distilling {len(chunks)} chunks")
         
-        # If chunks are few or total text is short, skip distillation (SPEED OPTIMIZATION)
-        total_len = self._total_text_length(chunks)
-        if len(chunks) <= 3 or total_len < 6000:
-            self.logger.info(f"Skipping distillation (total length {total_len} < 6000 chars)")
+        if len(chunks) <= 3:
+            self.logger.info(f"Skipping distillation (chunk count {len(chunks)} <= 3)")
             distilled_text = self._format_chunks_simple(chunks)
             return DistilledContext(
                 original_chunk_count=len(chunks),

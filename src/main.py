@@ -85,7 +85,8 @@ def initialize_system(config: dict):
         Path(config['paths']['raw_srt']).mkdir(parents=True, exist_ok=True)
         Path(config['paths']['processed']).mkdir(parents=True, exist_ok=True)
     else:
-        logger.info("💻 Running locally - Using ./data directory")
+        data_dir = DATA_DIR # Use the globally defined DATA_DIR for local execution
+        logger.info(f"Running locally - Using {data_dir} directory")
     
     # Initialize stores
     metadata_store = MetadataStore(config['paths']['metadata_db'])

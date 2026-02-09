@@ -47,7 +47,7 @@ class EmbeddingStore:
         self.model_name = config.get('model_name', 'BAAI/bge-base-en-v1.5')
         self.dimension = config.get('dimension', 768)
         env_label = "HuggingFace Spaces" if is_huggingface_space else "locally"
-        self.logger.info(f"🚀 Running {env_label} - using BGE model (768-dim)")
+        self.logger.info(f"Running {env_label} - using BGE model (768-dim)")
         
         self.normalize = config.get('normalize', True)
         self.batch_size = config.get('batch_size', 32)
