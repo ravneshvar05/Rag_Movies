@@ -28,7 +28,7 @@ class ContextDistiller:
         self.model_name = os.getenv('DISTILLER_MODEL', config.get('model'))
         self.max_tokens = config.get('max_tokens', 1000)
         self.temperature = config.get('temperature', 0.2)
-        self.compression_ratio = config.get('compression_ratio', 0.6)
+        self.compression_ratio = config.get('compression_ratio', 0.8)  # Increased from 0.6 to keep more detail
         self.timeout = config.get('timeout', 60)
         
         # Initialize Groq Client
@@ -136,13 +136,19 @@ class ContextDistiller:
     def _get_default_system_prompt(self) -> str:
         """Get default system prompt for distillation."""
         return """You are a context distiller for a movie transcript QA system.
-Your task is to compress transcript chunks while preserving:
-1. Key facts, dialogue, and events
-2. Character names and their actions
-3. Timestamps (keep as [HH:MM:SS] format)
-4. Causal relationships between events
+Your task is to refine transcript chunks to be used as context for answering a specific question.
 
-Be concise but complete. Remove redundancy and filler while keeping all relevant information.
+**GOAL: Preserve ALL details relevant to the question, even minor ones.**
+Do NOT over-summarize. Retention of specific details, quotes, and names is more important than brevity.
+
+Preserve:
+1. All facts, dialogue, and events related to the question
+2. Character names and their specific actions
+3. **Exact quotes or key phrases if relevant**
+4. Timestamps (keep as [HH:MM:SS] format)
+5. Causal relationships between events
+
+Be concise where possible, but err on the side of including too much detail rather than too little.
 Format timestamps as [HH:MM:SS] in your output."""
     
     def _build_user_prompt(

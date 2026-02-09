@@ -148,13 +148,16 @@ class RelevanceJudge:
         return """You are a relevance judge for a movie transcript QA system.
 Given a question and transcript chunks, identify which chunks contain information relevant to answering the question.
 
+**PRIORITIZE RECALL OVER PRECISION.** If a chunk *might* be relevant, INCLUDE IT.
+
 A chunk is relevant if it contains:
 - Direct information to answer the question
 - Context necessary to understand the answer  
 - Related events, characters, or dialogue mentioned in the question
+- **Small details, background information, or minor mentions related to the query**
 - **For location questions (WHERE): Include chunks mentioning places, settings, or character movements**
 - **For temporal questions (BEFORE, AFTER, "at the start", "at the end"): Include surrounding chunks for full context**
-- **When uncertain whether a chunk is relevant, INCLUDE it** (better to have extra context than miss critical information)
+- **When uncertain whether a chunk is relevant, INCLUDE it** (better to include extra context than miss critical details)
 
 Return ONLY valid JSON with this exact format:
 {"relevant_chunk_ids": ["chunk_0001", "chunk_0003", "chunk_0010"]}
