@@ -2,9 +2,11 @@
 Main entry point for the Movie Transcript RAG system.
 """
 import os
-print("[INFO] Setting offline mode programmatically...")
-os.environ['HF_HUB_OFFLINE'] = '1'
-os.environ['TRANSFORMERS_OFFLINE'] = '1'
+# [MODIFIED] Removed forced offline mode to allow model download on new envs (e.g. HF Spaces)
+# Local execution will use cached models if available.
+# print("[INFO] Setting offline mode programmatically...")
+# os.environ['HF_HUB_OFFLINE'] = '1'
+# os.environ['TRANSFORMERS_OFFLINE'] = '1'
 
 import sys
 import yaml
@@ -66,6 +68,11 @@ def initialize_system(config: dict):
     if IS_HF_SPACE:
         logger.info("🌐 Running on HuggingFace Spaces - Using persistent storage at /data")
         base_data_path = Path("/data")
+        
+        # Configure HuggingFace Cache to use persistent storage
+        # This prevents re-downloading models on every restart and avoids ephemeral disk limits
+        os.environ['HF_HOME'] = str(base_data_path / ".huggingface")
+        os.environ['TRANSFORMERS_CACHE'] = str(base_data_path / ".huggingface")
         
         # Override ALL data paths to use persistent storage
         config['paths']['raw_srt'] = str(base_data_path / "raw_srt")
