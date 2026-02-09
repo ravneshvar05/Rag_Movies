@@ -45,14 +45,11 @@ def load_config():
 
 config = load_config()
 
-# Initialize System (Lazy Load)
+# Initialize System (Cached Resource)
+@st.cache_resource(show_spinner="Initializing AI System...")
 def get_system():
-    if st.session_state.pipeline is None:
-        with st.spinner("Initializing AI System..."):
-            pipeline, metadata_store, _ = initialize_system(config)
-            st.session_state.pipeline = pipeline
-            st.session_state.metadata_store = metadata_store
-    return st.session_state.pipeline, st.session_state.metadata_store
+    pipeline, metadata_store, _ = initialize_system(config)
+    return pipeline, metadata_store
 
 pipeline, metadata_store = get_system()
 
@@ -81,9 +78,7 @@ with st.sidebar:
                     st.write("Chunking and Embedding...")
                     time.sleep(1) # UX pause
                     
-                    # Clear cached pipeline to force reload with new embeddings
-                    st.session_state.pipeline = None
-                    st.session_state.metadata_store = None
+                    get_system.clear()
                     
                     status.update(label="Ingestion Complete!", state="complete", expanded=False)
                     st.success(f"Successfully ingested {movie_id_input}!")
