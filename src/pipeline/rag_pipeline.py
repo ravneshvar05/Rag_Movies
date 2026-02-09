@@ -217,7 +217,7 @@ class RAGPipeline:
             relevant_chunks=0,
             answer=Answer(
                 question=question,
-                answer="I cannot find relevant information in the transcript to answer this question.",
+                answer="I cannot find any information about this in the transcript for this movie. Please ask questions related to the selected movie.",
                 supporting_timestamps=[],
                 confidence="low",
                 source_chunk_ids=[],

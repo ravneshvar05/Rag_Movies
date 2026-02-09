@@ -37,7 +37,7 @@ retrieval:
   
   hybrid:
     merge_strategy: "rrf"  # reciprocal rank fusion
-    max_final_chunks: 25  # Reverted to default
+    max_final_chunks: 35  # Increased from 25 for better recall in Fast Mode
   preserve_order: true  # keep temporal order
 
 pipeline:

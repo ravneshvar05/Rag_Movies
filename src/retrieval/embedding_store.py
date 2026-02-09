@@ -95,11 +95,25 @@ class EmbeddingStore:
                     else:
                         self.index = faiss.IndexFlatL2(self.dimension)
                     self.chunk_ids = []
+                    self.chunk_movie_map = {}
                 else:
                     # Dimensions match, use loaded index
                     self.index = loaded_index
                     with open(metadata_path, 'rb') as f:
-                        self.chunk_ids = pickle.load(f)
+                        data = pickle.load(f)
+                        # Handle old format (list) vs new format (dict with 'ids' and 'map')
+                        if isinstance(data, list):
+                            self.chunk_ids = data
+                            self.chunk_movie_map = {} # Will need external rebuild if not empty
+                            if self.chunk_ids:
+                                self.logger.warning("⚠️ Loaded legacy metadata format. Movie filtering may not work for existing chunks until re-ingestion.")
+                        elif isinstance(data, dict):
+                            self.chunk_ids = data.get('ids', [])
+                            self.chunk_movie_map = data.get('map', {})
+                        else:
+                            self.chunk_ids = []
+                            self.chunk_movie_map = {}
+                            
                     self.logger.info(f"✅ Loaded index with {len(self.chunk_ids)} vectors (dim={self.dimension})")
             except Exception as e:
                 self.logger.error(f"Failed to load index: {e}. Creating new one...")
@@ -109,6 +123,7 @@ class EmbeddingStore:
                 else:
                     self.index = faiss.IndexFlatL2(self.dimension)
                 self.chunk_ids = []
+                self.chunk_movie_map = {}
         else:
             self.logger.info("Creating new FAISS index")
             # Use IndexFlatIP for cosine similarity (with normalized vectors)
@@ -117,7 +132,8 @@ class EmbeddingStore:
             else:
                 self.index = faiss.IndexFlatL2(self.dimension)
             self.chunk_ids = []
-    
+            self.chunk_movie_map = {}
+
     def add_chunks(self, chunks: List[TranscriptChunk]) -> int:
         """
         Add chunks to the vector store.
@@ -148,9 +164,10 @@ class EmbeddingStore:
         # Add to FAISS index
         self.index.add(embeddings.astype('float32'))
         
-        # Store chunk IDs
+        # Store chunk IDs and movie mapping
         for chunk in chunks:
             self.chunk_ids.append(chunk.chunk_id)
+            self.chunk_movie_map[chunk.chunk_id] = chunk.movie_id
         
         self.logger.info(f"Added {len(chunks)} vectors to index")
         return len(chunks)
@@ -158,6 +175,7 @@ class EmbeddingStore:
     def search(
         self,
         query: str,
+        movie_id: Optional[str] = None,
         top_k: int = 30,
         threshold: float = 0.3
     ) -> List[Tuple[str, float]]:
@@ -166,6 +184,7 @@ class EmbeddingStore:
         
         Args:
             query: Search query
+            movie_id: Optional movie filter
             top_k: Number of results to return
             threshold: Minimum similarity threshold
             
@@ -183,25 +202,41 @@ class EmbeddingStore:
             normalize_embeddings=self.normalize
         )
         
+        # Determine search k
+        # If filtering by movie_id, fetch more candidates to ensure we have enough after filtering
+        search_k = top_k * 3 if movie_id else top_k
+        search_k = min(search_k, self.index.ntotal)
+        
         # Search
-        top_k = min(top_k, self.index.ntotal)
         distances, indices = self.index.search(
             query_embedding.astype('float32'),
-            top_k
+            search_k
         )
         
         # Convert to results
         results = []
         for idx, distance in zip(indices[0], distances[0]):
             if idx < len(self.chunk_ids):
+                chunk_id = self.chunk_ids[idx]
+                
+                # Filter by movie_id if provided
+                if movie_id:
+                    chunk_movie = self.chunk_movie_map.get(chunk_id)
+                    # If chunk metadata is missing (legacy), we might exclude it safely
+                    # or include it riskily. Here we exclude.
+                    if chunk_movie != movie_id:
+                        continue
+                
                 # FAISS returns distances, convert to similarity
                 similarity = float(distance)
                 
                 if similarity >= threshold:
-                    chunk_id = self.chunk_ids[idx]
                     results.append((chunk_id, similarity))
         
-        self.logger.debug(f"Found {len(results)} results above threshold {threshold}")
+        # Trim to requested top_k after filtering
+        results = results[:top_k]
+        
+        self.logger.debug(f"Found {len(results)} results above threshold {threshold} (movie_id={movie_id})")
         return results
     
     def save(self):
@@ -213,8 +248,14 @@ class EmbeddingStore:
         
         faiss.write_index(self.index, str(index_path))
         
+        # Save both IDs and Map
+        data = {
+            'ids': self.chunk_ids,
+            'map': self.chunk_movie_map
+        }
+        
         with open(metadata_path, 'wb') as f:
-            pickle.dump(self.chunk_ids, f)
+            pickle.dump(data, f)
         
         self.logger.info(f"Saved index with {len(self.chunk_ids)} vectors")
     
@@ -228,6 +269,7 @@ class EmbeddingStore:
             self.index = faiss.IndexFlatL2(self.dimension)
         
         self.chunk_ids = []
+        self.chunk_movie_map = {}
         self.logger.info("Cleared vector store")
     
     def get_stats(self) -> Dict[str, Any]:
@@ -236,5 +278,6 @@ class EmbeddingStore:
             'num_vectors': self.index.ntotal if self.index else 0,
             'dimension': self.dimension,
             'model': self.model_name,
-            'normalize': self.normalize
+            'normalize': self.normalize,
+            'movies_indexed': len(set(self.chunk_movie_map.values()))
         }

@@ -351,3 +351,20 @@ class MetadataStore:
         
         conn.close()
         return [row[0] for row in rows]
+
+    def get_chunk_movie_map(self) -> Dict[str, str]:
+        """
+        Get mapping of all chunk IDs to movie IDs.
+        Used for rebuilding the embedding store map.
+        
+        Returns:
+            Dict of chunk_id -> movie_id
+        """
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT chunk_id, movie_id FROM chunks')
+        rows = cursor.fetchall()
+        
+        conn.close()
+        return {row[0]: row[1] for row in rows}

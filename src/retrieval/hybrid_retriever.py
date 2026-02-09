@@ -69,6 +69,7 @@ class HybridRetriever:
         # (Single movie policy ensures all chunks belong to current movie)
         semantic_results = self.embedding_store.search(
             query,
+            movie_id=movie_id,
             top_k=self.semantic_top_k
         )
             

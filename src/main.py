@@ -98,6 +98,14 @@ def initialize_system(config: dict):
     # Initialize retrieval
     keyword_search = KeywordSearch(metadata_store, config['retrieval']['keyword'])
     
+    # [FIX] Backfill chunk_movie_map for legacy chunks if missing
+    if len(embedding_store.chunk_movie_map) < len(embedding_store.chunk_ids):
+        logger.warning(f"⚠️ Chunk map mismatch (Map: {len(embedding_store.chunk_movie_map)}, IDs: {len(embedding_store.chunk_ids)}). Backfilling from MetadataStore...")
+        full_map = metadata_store.get_chunk_movie_map()
+        embedding_store.chunk_movie_map = full_map
+        embedding_store.save()
+        logger.info(f"✅ Backfilled chunk map with {len(full_map)} entries and saved to disk.")
+    
     hybrid_retriever = HybridRetriever(
         embedding_store,
         keyword_search,
@@ -148,10 +156,15 @@ def ingest_srt(srt_path: str, movie_id: str, config: dict):
     _, metadata_store, embedding_store = initialize_system(config)
     
     # ENFORCE SINGLE MOVIE POLICY: Clear existing data
-    logger.info("Enforcing Single Movie Policy: Clearing existing data...")
-    metadata_store.clear_all()
-    embedding_store.clear()
-    logger.info("Data cleared.")
+    # logger.info("Enforcing Single Movie Policy: Clearing existing data...")
+    # metadata_store.clear_all()
+    # embedding_store.clear()
+    
+    # [MODIFIED] Multi-movie support: Only clear metadata for THIS movie if it exists (re-ingestion)
+    # Note: Vector store appends are additive; old vectors for this movie will become "orphans" 
+    # (retrievable but filtered out by metadata store). for perfect cleanup, vector store needs rebuild.
+    logger.info(f"Preparing ingestion for {movie_id}...")
+    metadata_store.clear_movie(movie_id)
     
     # Parse SRT
     parser = SRTParser()

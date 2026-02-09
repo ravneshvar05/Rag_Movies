@@ -1,0 +1,49 @@
+2026-02-09 22:59:43,186 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 22:59:43,186 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 22:59:43,189 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 22:59:43,189 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 22:59:43,189 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 23:00:02,421 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 23:00:03,096 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 23:00:03,632 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 23:00:04,263 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 23:00:04,866 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 23:00:04,867 - __main__ - INFO - System initialized successfully
+2026-02-09 23:00:04,867 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 23:00:04,867 - src.pipeline.rag_pipeline - INFO - Processing question: where rockey was before coming to banglore where rockey was
+2026-02-09 23:00:04,868 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 23:00:04,868 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 23:00:05,581 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 23:00:05,581 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 23:00:05,581 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 23:00:05,581 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 23:00:05,582 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 23:00:05,582 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: where rockey was before coming to banglore where rockey was
+2026-02-09 23:00:05,902 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 23:00:05,918 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 23:00:05,918 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 23:00:05,918 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance (SKIPPED by config)
+2026-02-09 23:00:05,918 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context (SKIPPED by config)
+2026-02-09 23:00:05,921 - src.pipeline.rag_pipeline - INFO - Using raw text from 25 chunks (9396 chars)
+2026-02-09 23:00:05,921 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 23:00:05,921 - src.llm.answerer - INFO - Generating answer for question: where rockey was before coming to banglore where rockey was
+2026-02-09 23:00:06,649 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 23:00:06,649 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 23:00:06,650 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 23:00:06,650 - src.pipeline.rag_pipeline - INFO - Confidence: high
+2026-02-09 23:00:06,650 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 23:00:06,650 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 1.78s
+2026-02-09 23:00:06,650 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: Before coming to Bangalore, Rocky was in Bombay. This is mentioned at [00:13:09.605] where it is stated that "For that dream, he reached the city of friction, Bombay!" and later at [00:33:05.154] where it is said "In Bangalore, you have to finish a task for me... If you do that... The whole of Bombay... Will be yours!" indicating that Rocky was in Bombay before being sent to Bangalore.
+Timestamps: 00:13:09.605, 00:33:05.154
+
+Processing time: 1.78s
