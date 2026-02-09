@@ -138,6 +138,12 @@ def ingest_srt(srt_path: str, movie_id: str, config: dict):
     # Initialize components
     _, metadata_store, embedding_store = initialize_system(config)
     
+    # ENFORCE SINGLE MOVIE POLICY: Clear existing data
+    logger.info("Enforcing Single Movie Policy: Clearing existing data...")
+    metadata_store.clear_all()
+    embedding_store.clear()
+    logger.info("Data cleared.")
+    
     # Parse SRT
     parser = SRTParser()
     entries = parser.parse_file(srt_path)

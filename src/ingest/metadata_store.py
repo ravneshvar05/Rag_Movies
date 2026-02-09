@@ -317,6 +317,25 @@ class MetadataStore:
         self.logger.info(f"Deleted {deleted} chunks for movie {movie_id}")
         return deleted
 
+    def clear_all(self) -> int:
+        """
+        Delete all chunks from the store.
+        
+        Returns:
+            Number of chunks deleted
+        """
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('DELETE FROM chunks')
+        deleted = cursor.rowcount
+        
+        conn.commit()
+        conn.close()
+        
+        self.logger.info(f"Cleared {deleted} chunks from metadata store")
+        return deleted
+
     def list_movies(self) -> List[str]:
         """
         Get list of all ingested movie IDs.

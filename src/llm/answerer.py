@@ -195,17 +195,16 @@ class Answerer:
     
     def _get_default_system_prompt(self) -> str:
         """Get default system prompt for answering."""
-        return """You are a movie transcript QA assistant. Answer questions based ONLY on the provided transcript context.
+        return """You are a helpful assistant analyzing the transcript of a movie.
+Answer questions based ONLY on the provided context.
 
 Rules:
-1. Answer ONLY from the given context - do not use external knowledge
-2. Always cite timestamps when possible using [HH:MM:SS] format
-3. If the answer is not in the context, say "I cannot find this information in the transcript"
-4. Be specific and accurate
-5. If multiple timestamps are relevant, cite all of them
-6. Keep answers concise but complete
+1. Answer ONLY from the given context.
+2. If the answer is not in the context, say "I cannot find this information in the transcript".
+3. Always cite timestamps when possible using [HH:MM:SS] format.
+4. Be specific, accurate, and concise.
 
-Format your answer clearly and cite timestamps."""
+Format your answer clearly."""
     
     def _build_user_prompt(
         self,

@@ -66,10 +66,12 @@ class HybridRetriever:
         self.logger.info(f"Hybrid retrieval for query: {query[:100]}")
         
         # 1. Semantic retrieval
+        # (Single movie policy ensures all chunks belong to current movie)
         semantic_results = self.embedding_store.search(
             query,
             top_k=self.semantic_top_k
         )
+            
         semantic_chunk_ids = {chunk_id: score for chunk_id, score in semantic_results}
         
         self.logger.debug(f"Semantic search returned {len(semantic_results)} results")
