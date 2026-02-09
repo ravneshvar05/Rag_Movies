@@ -70,14 +70,20 @@ class RAGPipeline:
         self.logger.info(f"{'='*80}")
         
         try:
-            # Step 1: Route question
-            self.logger.info("\n[STEP 1] Routing question...")
-            route = self.router.route(question)
-            self.logger.info(f"Category: {route.category}")
-            self.logger.info(f"Category: {route.category}")
-            self.logger.info(f"Requires full narrative: {route.requires_full_narrative}")
-            if route.token_usage:
-                starting_tokens.add(route.token_usage)
+            # Step 1: Route question (SKIPPED - Cost Optimization)
+            # Route to default category to save LLM call as the output is currently unused for logic
+            # self.logger.info("\n[STEP 1] Routing question...")
+            # route = self.router.route(question)
+            
+            route = QuestionRoute(
+                category="DEFAULT",
+                requires_full_narrative=False,
+                key_entities=[],
+                token_usage=TokenUsage()
+            )
+            self.logger.info(f"Using static route: {route.category} (LLM router skipped)")
+            # if route.token_usage:
+            #     starting_tokens.add(route.token_usage)
             
             # Step 2: Retrieve relevant chunks
             self.logger.info("\n[STEP 2] Retrieving chunks...")
