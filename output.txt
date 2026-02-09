@@ -1,0 +1,56 @@
+2026-02-09 19:36:58,298 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 19:36:58,298 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 19:36:58,301 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 19:36:58,301 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 19:36:58,301 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 19:37:21,277 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 19:37:22,081 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 19:37:22,725 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 19:37:23,344 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 19:37:23,958 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 19:37:23,959 - __main__ - INFO - System initialized successfully
+2026-02-09 19:37:23,959 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:37:23,959 - src.pipeline.rag_pipeline - INFO - Processing question: who is rockey
+2026-02-09 19:37:23,959 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 19:37:23,959 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 19:37:24,363 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 19:37:24,363 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:37:24,364 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:37:24,365 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 19:37:24,366 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 19:37:24,366 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: who is rockey
+2026-02-09 19:37:25,277 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 19:37:25,302 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 19:37:25,302 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 19:37:25,302 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance (SKIPPED by config)
+2026-02-09 19:37:25,303 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context (SKIPPED by config)
+2026-02-09 19:37:25,306 - src.pipeline.rag_pipeline - INFO - Using raw text from 25 chunks (5752 chars)
+2026-02-09 19:37:25,306 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 19:37:25,306 - src.llm.answerer - INFO - Generating answer for question: who is rockey
+2026-02-09 19:37:26,342 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 19:37:26,342 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:37:26,343 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:37:26,343 - src.pipeline.rag_pipeline - INFO - Confidence: medium
+2026-02-09 19:37:26,344 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:37:26,344 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 2.38s
+2026-02-09 19:37:26,344 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: Based on the provided context, Rocky is a powerful and influential figure, often referred to as "Rocky Don" or "Rocky Boss". He is described as a criminal brand since 1951 [no specific timestamp available]. 
+
+It is mentioned that "Even though many had not seen him, his name was known to all... Rocky!" [no specific timestamp available], indicating that he is a well-known figure, even if not everyone has seen him. 
+
+Rocky is also described as a "dynamite like him is born" [no specific timestamp available] and "The one who has grown with fire! Persistently moving ahead! A warrior who has taken an oath!" [no specific timestamp available], suggesting that he is a strong and determined individual. 
+
+Additionally, it is stated that "Without Rocky's orders, in Bombay, no decisions were being taken!" [no specific timestamp available], implying that he has significant control and influence over the city. 
+
+However, no specific information is available about his personal life, background, or motivations, except that he is a key figure in the city's underworld and is feared and respected by many.
+
+Processing time: 2.38s

@@ -1,0 +1,57 @@
+2026-02-09 19:47:21,128 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 19:47:21,128 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 19:47:21,131 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 19:47:21,131 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 19:47:21,131 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 19:47:40,217 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 19:47:40,962 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 19:47:41,506 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 19:47:42,063 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 19:47:42,600 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 19:47:42,600 - __main__ - INFO - System initialized successfully
+2026-02-09 19:47:42,601 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:47:42,601 - src.pipeline.rag_pipeline - INFO - Processing question: what brand of cigarettes does the character smoke?
+2026-02-09 19:47:42,601 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 19:47:42,601 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 19:47:43,002 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 19:47:43,002 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:47:43,002 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:47:43,004 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 19:47:43,004 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 19:47:43,004 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: what brand of cigarettes does the character smoke?
+2026-02-09 19:47:43,273 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 19:47:43,290 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 19:47:43,290 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 19:47:43,290 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance...
+2026-02-09 19:47:43,291 - src.llm.relevance_judge - INFO - Judging relevance for 25 chunks
+2026-02-09 19:47:43,685 - src.llm.relevance_judge - INFO - Judged 2 / 20 chunks as relevant
+2026-02-09 19:47:43,893 - src.llm.relevance_judge - INFO - Judged 2 / 5 chunks as relevant
+2026-02-09 19:47:43,893 - src.pipeline.rag_pipeline - INFO - Filtered to 4 relevant chunks (from 25)
+2026-02-09 19:47:43,893 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context...
+2026-02-09 19:47:43,894 - src.llm.distiller - INFO - Distilling 4 chunks
+2026-02-09 19:47:44,442 - src.llm.distiller - INFO - Distilled 4 chunks (compression ~106.6%)
+2026-02-09 19:47:44,442 - src.pipeline.rag_pipeline - INFO - Distilled 4 chunks into 727 characters
+2026-02-09 19:47:44,442 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 19:47:44,442 - src.llm.answerer - INFO - Generating answer for question: what brand of cigarettes does the character smoke?
+2026-02-09 19:47:44,901 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 19:47:44,901 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:47:44,902 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:47:44,902 - src.pipeline.rag_pipeline - INFO - Confidence: low
+2026-02-09 19:47:44,902 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:47:44,902 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 2.30s
+2026-02-09 19:47:44,902 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: I cannot find this information in the transcript. 
+
+The transcript mentions Character 1 suggesting to "Have a smoke" at [00:36:43.445] and Character 2 repeating the phrase, but it does not provide any information about the brand of cigarettes.
+Timestamps: 00:36:43.445
+
+Processing time: 2.30s

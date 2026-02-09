@@ -142,7 +142,7 @@ if prompt := st.chat_input("Ask a question about the movie..."):
                 answer_text = result.answer.answer
                 
                 # Add Metadata display
-                meta_info = f"\n\n---\n**Sources:** {result.relevant_chunks} chunks used | **Model:** {result.answer.model_used}"
+                meta_info = f"\n\n---\n**Model:** {result.answer.model_used}"
                 if result.answer.supporting_timestamps:
                     meta_info += f" | **Timestamps:** {', '.join(result.answer.supporting_timestamps)}"
                 

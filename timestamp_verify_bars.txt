@@ -1,0 +1,48 @@
+2026-02-09 19:59:10,647 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 19:59:10,647 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 19:59:10,650 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 19:59:10,650 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 19:59:10,651 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 19:59:52,267 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 19:59:53,197 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 19:59:53,759 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 19:59:54,319 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 19:59:54,889 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 19:59:54,889 - __main__ - INFO - System initialized successfully
+2026-02-09 19:59:54,889 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:59:54,889 - src.pipeline.rag_pipeline - INFO - Processing question: how many gold bars does he need
+2026-02-09 19:59:54,890 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 19:59:54,891 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 19:59:55,547 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 19:59:55,547 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:59:55,547 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:59:55,547 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 19:59:55,547 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 19:59:55,547 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: how many gold bars does he need
+2026-02-09 19:59:56,211 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 19:59:56,236 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 19:59:56,236 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 19:59:56,236 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance (SKIPPED by config)
+2026-02-09 19:59:56,236 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context (SKIPPED by config)
+2026-02-09 19:59:56,260 - src.pipeline.rag_pipeline - INFO - Using raw text from 25 chunks (11415 chars)
+2026-02-09 19:59:56,260 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 19:59:56,260 - src.llm.answerer - INFO - Generating answer for question: how many gold bars does he need
+2026-02-09 19:59:56,768 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 19:59:56,769 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:59:56,769 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:59:56,769 - src.pipeline.rag_pipeline - INFO - Confidence: low
+2026-02-09 19:59:56,770 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:59:56,771 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 1.88s
+2026-02-09 19:59:56,771 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: I cannot find this information in the transcript. The conversation revolves around gold, its value, and the characters' involvement in the gold trade, but it does not mention a specific number of gold bars that someone needs.
+
+Processing time: 1.88s

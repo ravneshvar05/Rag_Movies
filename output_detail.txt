@@ -1,0 +1,48 @@
+2026-02-09 19:38:00,781 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 19:38:00,781 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 19:38:00,783 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 19:38:00,783 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 19:38:00,783 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 19:38:22,104 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 19:38:22,916 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 19:38:23,550 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 19:38:24,312 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 19:38:25,265 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 19:38:25,265 - __main__ - INFO - System initialized successfully
+2026-02-09 19:38:25,267 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:38:25,268 - src.pipeline.rag_pipeline - INFO - Processing question: what brand of cigarettes does the character smoke?
+2026-02-09 19:38:25,269 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 19:38:25,269 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 19:38:25,507 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 19:38:25,507 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:38:25,507 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:38:25,507 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 19:38:25,507 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 19:38:25,507 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: what brand of cigarettes does the character smoke?
+2026-02-09 19:38:27,421 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 19:38:27,466 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 19:38:27,467 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 19:38:27,467 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance (SKIPPED by config)
+2026-02-09 19:38:27,467 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context (SKIPPED by config)
+2026-02-09 19:38:27,471 - src.pipeline.rag_pipeline - INFO - Using raw text from 25 chunks (8328 chars)
+2026-02-09 19:38:27,472 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 19:38:27,472 - src.llm.answerer - INFO - Generating answer for question: what brand of cigarettes does the character smoke?
+2026-02-09 19:38:27,943 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 19:38:27,943 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:38:27,944 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:38:27,944 - src.pipeline.rag_pipeline - INFO - Confidence: low
+2026-02-09 19:38:27,944 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:38:27,945 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 2.68s
+2026-02-09 19:38:27,945 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: I cannot find this information in the transcript. The context only mentions "Smoke... Have a smoke!" [no specific timestamp available] but does not specify the brand of cigarettes.
+
+Processing time: 2.68s

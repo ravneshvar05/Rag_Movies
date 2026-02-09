@@ -31,14 +31,18 @@ retrieval:
     similarity_threshold: 0.3
   
   keyword:
-    top_k: 30
+    top_k: 20  # Reverted to default
     min_match_score: 0.5
     enable_fuzzy: true
   
   hybrid:
     merge_strategy: "rrf"  # reciprocal rank fusion
-    max_final_chunks: 25
-    preserve_order: true  # keep temporal order
+    max_final_chunks: 25  # Reverted to default
+  preserve_order: true  # keep temporal order
+
+pipeline:
+  enable_judge: false      # DISABLED per user request
+  enable_distiller: false  # DISABLED per user request
 
 llm:
   router:
@@ -49,14 +53,14 @@ llm:
     
   judge:
     model: "llama-3.1-8b-instant"  # Groq: Fast, reliable API
-    max_tokens: 500
+    max_tokens: 200  # OPTIMIZATION: Reduced from 500 (JSON only)
     temperature: 0.1
     batch_size: 5
     timeout: 45
     
   distiller:
     model: "llama-3.1-8b-instant"  # Groq: Fast, reliable API
-    max_tokens: 1000
+    max_tokens: 800  # OPTIMIZATION: Reduced from 1000
     temperature: 0.2
     compression_ratio: 0.75  # Relaxed from 0.6 to preserve scene details
     timeout: 60

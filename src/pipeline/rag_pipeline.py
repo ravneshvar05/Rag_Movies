@@ -3,7 +3,7 @@ Main RAG pipeline orchestrating all components.
 """
 import time
 from typing import Optional
-from src.models.schemas import RAGResult, QuestionRoute, Answer, TokenUsage
+from src.models.schemas import RAGResult, QuestionRoute, Answer, TokenUsage, DistilledContext
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.llm.router import QuestionRouter
 from src.llm.relevance_judge import RelevanceJudge
@@ -25,7 +25,8 @@ class RAGPipeline:
         router: QuestionRouter,
         judge: RelevanceJudge,
         distiller: ContextDistiller,
-        answerer: Answerer
+        answerer: Answerer,
+        config: dict = None
     ):
         """
         Initialize RAG pipeline.
@@ -36,12 +37,14 @@ class RAGPipeline:
             judge: RelevanceJudge instance
             distiller: ContextDistiller instance
             answerer: Answerer instance
+            config: Configuration dictionary
         """
         self.retriever = retriever
         self.router = router
         self.judge = judge
         self.distiller = distiller
         self.answerer = answerer
+        self.config = config or {}
         self.logger = logger
     
     def process(
@@ -89,36 +92,58 @@ class RAGPipeline:
                 return self._create_no_context_result(question, route, start_time)
             
             # Step 3: Judge relevance
-            self.logger.info("\n[STEP 3] Judging relevance...")
-            judgment = self.judge.judge(question, retrieved_chunks)
-            if judgment.token_usage:
-                starting_tokens.add(judgment.token_usage)
+            enable_judge = self.config.get('pipeline', {}).get('enable_judge', True)
             
-            # Filter to relevant chunks
-            relevant_chunk_ids = set(judgment.relevant_chunk_ids)
-            relevant_chunks = [
-                c for c in retrieved_chunks
-                if c.chunk_id in relevant_chunk_ids
-            ]
-            
-            self.logger.info(
-                f"Filtered to {len(relevant_chunks)} relevant chunks "
-                f"(from {len(retrieved_chunks)})"
-            )
-            
-            if not relevant_chunks:
-                self.logger.warning("No relevant chunks after filtering")
-                return self._create_no_context_result(question, route, start_time)
+            if enable_judge:
+                self.logger.info("\n[STEP 3] Judging relevance...")
+                judgment = self.judge.judge(question, retrieved_chunks)
+                if judgment.token_usage:
+                    starting_tokens.add(judgment.token_usage)
+                
+                # Filter to relevant chunks
+                relevant_chunk_ids = set(judgment.relevant_chunk_ids)
+                relevant_chunks = [
+                    c for c in retrieved_chunks
+                    if c.chunk_id in relevant_chunk_ids
+                ]
+                
+                self.logger.info(
+                    f"Filtered to {len(relevant_chunks)} relevant chunks "
+                    f"(from {len(retrieved_chunks)})"
+                )
+                
+                if not relevant_chunks:
+                    self.logger.warning("No relevant chunks after filtering")
+                    return self._create_no_context_result(question, route, start_time)
+            else:
+                self.logger.info("\n[STEP 3] Judging relevance (SKIPPED by config)")
+                relevant_chunks = retrieved_chunks
             
             # Step 4: Distill context
-            self.logger.info("\n[STEP 4] Distilling context...")
-            distilled_context = self.distiller.distill(question, relevant_chunks)
-            self.logger.info(
-                f"Distilled {distilled_context.original_chunk_count} chunks "
-                f"into {len(distilled_context.distilled_text)} characters"
-            )
-            if distilled_context.token_usage:
-                starting_tokens.add(distilled_context.token_usage)
+            enable_distiller = self.config.get('pipeline', {}).get('enable_distiller', True)
+            
+            if enable_distiller:
+                self.logger.info("\n[STEP 4] Distilling context...")
+                distilled_context = self.distiller.distill(question, relevant_chunks)
+                self.logger.info(
+                    f"Distilled {distilled_context.original_chunk_count} chunks "
+                    f"into {len(distilled_context.distilled_text)} characters"
+                )
+                if distilled_context.token_usage:
+                    starting_tokens.add(distilled_context.token_usage)
+            else:
+                 self.logger.info("\n[STEP 4] Distilling context (SKIPPED by config)")
+                 # Create a dummy distilled context using raw text
+                 # [FIX] Prepend timestamps to raw text so Answerer can cite them
+                 raw_text = "\n\n".join([f"[{c.start_time}] {c.text}" for c in relevant_chunks])
+                 
+                 distilled_context = DistilledContext(
+                     original_chunk_count=len(relevant_chunks),
+                     distilled_text=raw_text,
+                     preserved_timestamps=[str(c.start_time) for c in relevant_chunks],
+                     key_facts=[]
+                 )
+                 self.logger.info(f"Using raw text from {len(relevant_chunks)} chunks ({len(raw_text)} chars)")
             
             # Step 5: Generate answer
             self.logger.info("\n[STEP 5] Generating answer...")

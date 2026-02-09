@@ -117,7 +117,8 @@ def initialize_system(config: dict):
         router,
         judge,
         distiller,
-        answerer
+        answerer,
+        config
     )
     
     logger.info("System initialized successfully")

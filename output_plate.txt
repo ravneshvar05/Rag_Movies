@@ -1,0 +1,48 @@
+2026-02-09 19:38:53,583 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 19:38:53,583 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 19:38:53,586 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 19:38:53,586 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 19:38:53,586 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 19:39:17,313 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 19:39:18,032 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 19:39:18,654 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 19:39:19,286 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 19:39:19,914 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 19:39:19,914 - __main__ - INFO - System initialized successfully
+2026-02-09 19:39:19,915 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:39:19,915 - src.pipeline.rag_pipeline - INFO - Processing question: what is the license plate number of the car?
+2026-02-09 19:39:19,915 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 19:39:19,915 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 19:39:21,158 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 19:39:21,158 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:39:21,158 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:39:21,158 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 19:39:21,159 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 19:39:21,159 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: what is the license plate number of the car?
+2026-02-09 19:39:21,898 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 19:39:21,925 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 19:39:21,926 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 19:39:21,927 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance (SKIPPED by config)
+2026-02-09 19:39:21,927 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context (SKIPPED by config)
+2026-02-09 19:39:21,929 - src.pipeline.rag_pipeline - INFO - Using raw text from 25 chunks (7382 chars)
+2026-02-09 19:39:21,930 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 19:39:21,930 - src.llm.answerer - INFO - Generating answer for question: what is the license plate number of the car?
+2026-02-09 19:39:22,418 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 19:39:22,418 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:39:22,418 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:39:22,419 - src.pipeline.rag_pipeline - INFO - Confidence: low
+2026-02-09 19:39:22,419 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:39:22,419 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 2.50s
+2026-02-09 19:39:22,420 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: I cannot find this information in the transcript. The transcript does mention a "Driving License" at several points, but it does not provide a specific license plate number for a car.
+
+Processing time: 2.50s

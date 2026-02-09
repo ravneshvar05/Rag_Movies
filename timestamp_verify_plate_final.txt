@@ -1,0 +1,49 @@
+2026-02-09 20:01:27,464 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 20:01:27,465 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 20:01:27,466 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 20:01:27,467 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 20:01:27,467 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 20:01:47,393 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 20:01:48,421 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 20:01:49,007 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 20:01:49,542 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 20:01:50,170 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 20:01:50,170 - __main__ - INFO - System initialized successfully
+2026-02-09 20:01:50,170 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 20:01:50,170 - src.pipeline.rag_pipeline - INFO - Processing question: what is the license plate number of the car?
+2026-02-09 20:01:50,170 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 20:01:50,171 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 20:01:51,042 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 20:01:51,043 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 20:01:51,043 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 20:01:51,043 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 20:01:51,043 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 20:01:51,043 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: what is the license plate number of the car?
+2026-02-09 20:01:51,924 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 20:01:51,953 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 20:01:51,954 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 20:01:51,954 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance (SKIPPED by config)
+2026-02-09 20:01:51,954 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context (SKIPPED by config)
+2026-02-09 20:01:51,961 - src.pipeline.rag_pipeline - INFO - Using raw text from 25 chunks (7757 chars)
+2026-02-09 20:01:51,962 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 20:01:51,963 - src.llm.answerer - INFO - Generating answer for question: what is the license plate number of the car?
+2026-02-09 20:01:52,451 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 20:01:52,451 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 20:01:52,451 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 20:01:52,451 - src.pipeline.rag_pipeline - INFO - Confidence: low
+2026-02-09 20:01:52,451 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 20:01:52,452 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 2.28s
+2026-02-09 20:01:52,452 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: I cannot find this information in the transcript. The transcript mentions a driving license at [00:53:22.155] and [00:53:47.744], but it does not provide the license plate number of a car.
+Timestamps: 00:53:22.155, 00:53:47.744
+
+Processing time: 2.28s

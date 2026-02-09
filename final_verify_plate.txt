@@ -1,0 +1,55 @@
+2026-02-09 19:46:51,312 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 19:46:51,312 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 19:46:51,315 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 19:46:51,315 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 19:46:51,315 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 19:47:11,960 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 19:47:12,716 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 19:47:13,272 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 19:47:13,892 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 19:47:14,492 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 19:47:14,493 - __main__ - INFO - System initialized successfully
+2026-02-09 19:47:14,493 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:47:14,493 - src.pipeline.rag_pipeline - INFO - Processing question: what is the license plate number of the car?
+2026-02-09 19:47:14,493 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 19:47:14,493 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 19:47:15,103 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 19:47:15,103 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:47:15,103 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:47:15,103 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 19:47:15,104 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 19:47:15,104 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: what is the license plate number of the car?
+2026-02-09 19:47:15,737 - src.retrieval.keyword_search - INFO - Keyword search returned 20 results (filtered from 20)
+2026-02-09 19:47:15,782 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 19:47:15,782 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 19:47:15,784 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance...
+2026-02-09 19:47:15,784 - src.llm.relevance_judge - INFO - Judging relevance for 25 chunks
+2026-02-09 19:47:16,466 - src.llm.relevance_judge - INFO - Judged 2 / 20 chunks as relevant
+2026-02-09 19:47:16,811 - src.llm.relevance_judge - INFO - Judged 3 / 5 chunks as relevant
+2026-02-09 19:47:16,812 - src.pipeline.rag_pipeline - INFO - Filtered to 5 relevant chunks (from 25)
+2026-02-09 19:47:16,812 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context...
+2026-02-09 19:47:16,812 - src.llm.distiller - INFO - Distilling 5 chunks
+2026-02-09 19:47:17,621 - src.llm.distiller - INFO - Distilled 5 chunks (compression ~212.6%)
+2026-02-09 19:47:17,621 - src.pipeline.rag_pipeline - INFO - Distilled 5 chunks into 1214 characters
+2026-02-09 19:47:17,621 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 19:47:17,622 - src.llm.answerer - INFO - Generating answer for question: what is the license plate number of the car?
+2026-02-09 19:47:18,112 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 19:47:18,112 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:47:18,113 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:47:18,113 - src.pipeline.rag_pipeline - INFO - Confidence: low
+2026-02-09 19:47:18,113 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:47:18,113 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 3.62s
+2026-02-09 19:47:18,114 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: I cannot find this information in the transcript. The transcript mentions a "Driving License" at [00:53:22.155] and [00:53:47.744], but it does not provide a specific license plate number. Additionally, at [02:09:27.395], it mentions that the emperor missed the speaker's plate (likely referring to a license plate), but the number is not given.
+Timestamps: 00:53:22.155, 00:53:47.744, 02:09:27.395
+
+Processing time: 3.62s

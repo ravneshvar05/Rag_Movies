@@ -1,0 +1,48 @@
+2026-02-09 19:52:53,655 - __main__ - INFO - Initializing Movie RAG system...
+2026-02-09 19:52:53,656 - __main__ - INFO - Running locally - Using data\processed directory
+2026-02-09 19:52:53,659 - src.ingest.metadata_store - INFO - Metadata store initialized at data\processed\metadata.db
+2026-02-09 19:52:53,660 - src.retrieval.embedding_store - INFO - Running locally - using BGE model (768-dim)
+2026-02-09 19:52:53,660 - src.retrieval.embedding_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2026-02-09 19:53:13,066 - src.retrieval.embedding_store - INFO - Loading existing FAISS index
+2026-02-09 19:53:13,815 - src.llm.router - INFO - Router initialized with model: llama-3.1-8b-instant
+2026-02-09 19:53:14,374 - src.llm.relevance_judge - INFO - Judge initialized with model: llama-3.1-8b-instant
+2026-02-09 19:53:14,899 - src.llm.distiller - INFO - Distiller initialized with model: llama-3.1-8b-instant
+2026-02-09 19:53:15,433 - src.llm.answerer - INFO - Answerer initialized: primary=llama-3.3-70b-versatile, fallback=llama-3.1-8b-instant
+2026-02-09 19:53:15,433 - __main__ - INFO - System initialized successfully
+2026-02-09 19:53:15,434 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:53:15,434 - src.pipeline.rag_pipeline - INFO - Processing question: hello
+2026-02-09 19:53:15,434 - src.pipeline.rag_pipeline - INFO - ================================================================================
+2026-02-09 19:53:15,435 - src.pipeline.rag_pipeline - INFO - 
+[STEP 1] Routing question...
+2026-02-09 19:53:15,870 - src.llm.router - INFO - Question routed to: WHAT
+2026-02-09 19:53:15,870 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:53:15,870 - src.pipeline.rag_pipeline - INFO - Category: WHAT
+2026-02-09 19:53:15,871 - src.pipeline.rag_pipeline - INFO - Requires full narrative: False
+2026-02-09 19:53:15,871 - src.pipeline.rag_pipeline - INFO - 
+[STEP 2] Retrieving chunks...
+2026-02-09 19:53:15,871 - src.retrieval.hybrid_retriever - INFO - Hybrid retrieval for query: hello
+2026-02-09 19:53:16,230 - src.retrieval.keyword_search - INFO - Keyword search returned 7 results (filtered from 7)
+2026-02-09 19:53:16,252 - src.retrieval.hybrid_retriever - INFO - Retrieved 25 final chunks
+2026-02-09 19:53:16,252 - src.pipeline.rag_pipeline - INFO - Retrieved 25 chunks
+2026-02-09 19:53:16,253 - src.pipeline.rag_pipeline - INFO - 
+[STEP 3] Judging relevance (SKIPPED by config)
+2026-02-09 19:53:16,253 - src.pipeline.rag_pipeline - INFO - 
+[STEP 4] Distilling context (SKIPPED by config)
+2026-02-09 19:53:16,257 - src.pipeline.rag_pipeline - INFO - Using raw text from 25 chunks (5344 chars)
+2026-02-09 19:53:16,258 - src.pipeline.rag_pipeline - INFO - 
+[STEP 5] Generating answer...
+2026-02-09 19:53:16,258 - src.llm.answerer - INFO - Generating answer for question: hello
+2026-02-09 19:53:16,866 - src.llm.answerer - INFO - Answer generated successfully with llama-3.3-70b-versatile
+2026-02-09 19:53:16,866 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:53:16,866 - src.pipeline.rag_pipeline - INFO - Answer generated with model: llama-3.3-70b-versatile
+2026-02-09 19:53:16,866 - src.pipeline.rag_pipeline - INFO - Confidence: low
+2026-02-09 19:53:16,866 - src.pipeline.rag_pipeline - INFO - 
+================================================================================
+2026-02-09 19:53:16,867 - src.pipeline.rag_pipeline - INFO - Pipeline completed in 1.43s
+2026-02-09 19:53:16,867 - src.pipeline.rag_pipeline - INFO - ================================================================================
+
+
+Answer: I cannot find this information in the transcript. The provided context does not contain a specific question or information related to "hello" that can be answered. However, the word "hello" appears in several instances, such as [no specific timestamp available due to lack of timestamp information in the provided context], but without more context, it's impossible to provide a meaningful answer.
+
+Processing time: 1.43s
