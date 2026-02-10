@@ -96,14 +96,15 @@ with st.sidebar:
     
     # Refresh movie list
     available_movies = metadata_store.list_movies()
+    movie_options = ["Select a Movie..."] + available_movies
     selected_movie = st.selectbox(
         "Select Movie to Chat With", 
-        ["All Movies (Global Search)"] + available_movies,
+        movie_options,
         index=0
     )
     
     # Determine movie_id filter
-    active_movie_id = None if selected_movie == "All Movies (Global Search)" else selected_movie
+    active_movie_id = None if selected_movie == "Select a Movie..." else selected_movie
     
     # Delete Button
     if active_movie_id:
@@ -125,37 +126,41 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Chat Input
-if prompt := st.chat_input("Ask a question about the movie..."):
-    # Add user message
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+# Chat Input - Check if movie is selected
+if active_movie_id:
+    if prompt := st.chat_input(f"Ask about {active_movie_id}..."):
+        # Add user message
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
 
-    # Generate Answer
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            try:
-                result = pipeline.process(prompt, movie_id=active_movie_id)
-                
-                # Format Answer
-                answer_text = result.answer.answer
-                
-                # Add Metadata display
-                meta_info = f"\n\n---\n**Model:** {result.answer.model_used}"
-                if result.answer.supporting_timestamps:
-                    meta_info += f" | **Timestamps:** {', '.join(result.answer.supporting_timestamps)}"
-                
-                # Display Token Usage
-                if result.token_usage:
-                    meta_info += f" | **Tokens:** {result.token_usage.total_tokens} (Prompt: {result.token_usage.prompt_tokens}, Completion: {result.token_usage.completion_tokens})"
-                
-                full_response = answer_text + meta_info
-                
-                st.markdown(full_response)
-                
-                # Add to history
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-                
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
+        # Generate Answer
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                try:
+                    result = pipeline.process(prompt, movie_id=active_movie_id)
+                    
+                    # Format Answer
+                    answer_text = result.answer.answer
+                    
+                    # Add Metadata display
+                    meta_info = f"\n\n---\n**Model:** {result.answer.model_used}"
+                    if result.answer.supporting_timestamps:
+                        meta_info += f" | **Timestamps:** {', '.join(result.answer.supporting_timestamps)}"
+                    
+                    # Display Token Usage
+                    if result.token_usage:
+                        meta_info += f" | **Tokens:** {result.token_usage.total_tokens} (Prompt: {result.token_usage.prompt_tokens}, Completion: {result.token_usage.completion_tokens})"
+                    
+                    full_response = answer_text + meta_info
+                    
+                    st.markdown(full_response)
+                    
+                    # Add to history
+                    st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
+else:
+    if available_movies:
+        st.warning("👈 Please select a movie from the sidebar to start chatting.")
