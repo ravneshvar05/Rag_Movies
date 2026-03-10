@@ -134,41 +134,53 @@ def initialize_system(config: dict):
     return pipeline, metadata_store, embedding_store
 
 
-def ingest_srt(srt_path: str, movie_id: str, config: dict):
+def ingest_file(file_path: str, movie_id: str, config: dict):
     """
-    Ingest an SRT file into the system.
+    Ingest a file (SRT, TXT, PDF) into the system.
     
     Args:
-        srt_path: Path to SRT file
+        file_path: Path to the file
         movie_id: Unique movie identifier
         config: Configuration dictionary
     """
     from src.utils.logger import MovieRAGLogger
     from src.ingest.srt_parser import SRTParser
+    from src.ingest.text_parser import TextParser
+    from src.ingest.pdf_parser import PDFParser
     from src.ingest.chunker import TranscriptChunker
     
     logger = MovieRAGLogger.get_logger(__name__)
     
-    logger.info(f"Ingesting SRT file: {srt_path}")
+    file_path_obj = Path(file_path)
+    if not file_path_obj.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+        
+    ext = file_path_obj.suffix.lower()
+    logger.info(f"Ingesting {ext.upper()} file: {file_path}")
     logger.info(f"Movie ID: {movie_id}")
     
     # Initialize components
     _, metadata_store, embedding_store = initialize_system(config)
     
-    # ENFORCE SINGLE MOVIE POLICY: Clear existing data
-    # logger.info("Enforcing Single Movie Policy: Clearing existing data...")
-    # metadata_store.clear_all()
-    # embedding_store.clear()
-    
-    # [MODIFIED] Multi-movie support: Only clear metadata for THIS movie if it exists (re-ingestion)
-    # Note: Vector store appends are additive; old vectors for this movie will become "orphans" 
-    # (retrievable but filtered out by metadata store). for perfect cleanup, vector store needs rebuild.
+    # Prepare ingestion
     logger.info(f"Preparing ingestion for {movie_id}...")
     metadata_store.clear_movie(movie_id)
     
-    # Parse SRT
-    parser = SRTParser()
-    entries = parser.parse_file(srt_path)
+    # Select parser
+    if ext == '.srt':
+        parser = SRTParser()
+    elif ext == '.txt':
+        parser = TextParser()
+    elif ext == '.pdf':
+        parser = PDFParser()
+    else:
+        raise ValueError(f"Unsupported file format: {ext}. Supported: .srt, .txt, .pdf")
+    
+    try:
+        entries = parser.parse_file(str(file_path_obj))
+    except Exception as e:
+        logger.error(f"Parsing failed: {e}")
+        return
     
     # Chunk entries
     chunker = TranscriptChunker(config['ingestion'])
@@ -259,8 +271,8 @@ def main():
     subparsers = parser.add_subparsers(dest='command', help='Command to run')
     
     # Ingest command
-    ingest_parser = subparsers.add_parser('ingest', help='Ingest SRT file')
-    ingest_parser.add_argument('srt_file', help='Path to SRT file')
+    ingest_parser = subparsers.add_parser('ingest', help='Ingest file (SRT, TXT, PDF)')
+    ingest_parser.add_argument('file', help='Path to file')
     ingest_parser.add_argument('movie_id', help='Unique movie identifier')
     
     # Interactive command
@@ -278,7 +290,7 @@ def main():
     
     # Execute command
     if args.command == 'ingest':
-        ingest_srt(args.srt_file, args.movie_id, config)
+        ingest_file(args.file, args.movie_id, config)
     
     elif args.command == 'interactive':
         interactive_mode(config)

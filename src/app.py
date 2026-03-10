@@ -18,7 +18,7 @@ logging.getLogger("streamlit.watcher.local_sources_watcher").setLevel(logging.ER
 import warnings
 warnings.filterwarnings("ignore", message=".*torch.classes.*")
 
-from src.main import initialize_system, ingest_srt
+from src.main import initialize_system, ingest_file
 from src.utils.logger import MovieRAGLogger
 
 # Configure Page
@@ -59,7 +59,7 @@ with st.sidebar:
     
     # 1. Ingestion Section
     st.subheader("New Movie Ingestion")
-    uploaded_file = st.file_uploader("Upload SRT File", type=["srt"])
+    uploaded_file = st.file_uploader("Upload Transcript File", type=["srt", "txt", "pdf"])
     movie_id_input = st.text_input("Movie ID (Unique)", placeholder="e.g. inception_2010")
     
     if st.button("Ingest Movie", type="primary"):
@@ -72,9 +72,9 @@ with st.sidebar:
                 f.write(uploaded_file.getbuffer())
             
             with st.status("Ingesting movie...", expanded=True) as status:
-                st.write("Parsing SRT...")
+                st.write(f"Parsing {uploaded_file.name}...")
                 try:
-                    ingest_srt(str(temp_path), movie_id_input, config)
+                    ingest_file(str(temp_path), movie_id_input, config)
                     st.write("Chunking and Embedding...")
                     time.sleep(1) # UX pause
                     
